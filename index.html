@@ -1,9 +1,18 @@
 <!doctype html>
+<!-- fix-2: webapp (manifest, service worker, terugknopbeveiliging, digidave-icoon) -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DigidaveStore</title>
+<meta name="theme-color" content="#0f1729">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./favicon.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Digidave">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
 <style>
@@ -27,7 +36,10 @@ img{max-width:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
 .wrap{max-width:1080px;margin:0 auto;padding-block:40px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 header{display:grid;gap:10px;margin-bottom:28px}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{width:36px;height:36px}
+.brand span{font-family:var(--body);font-weight:500;font-size:20px;letter-spacing:.01em;color:var(--navy)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:var(--bg);font-size:14px;padding:10px 16px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center;z-index:20}
 h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
 .lead{margin:0;max-width:62ch;color:var(--muted)}
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 32px}
@@ -62,7 +74,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">digidave</div>
+    <div class="brand"><img src="./icons/logo-mark.png" alt="" width="36" height="36"><span>digidave</span></div>
     <h1>Mijn projecten</h1>
     <p class="lead">Een overzicht van de apps en prototypes die ik samen met AI heb gebouwd. Klik op <strong>Open app</strong> om een project direct te starten.</p>
   </header>
@@ -77,6 +89,8 @@ footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font
   </nav>
 
   <main id="main"></main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <footer>Alle apps draaien in de browser. Voor sommige apps moet je eerst inloggen.</footer>
 </div>
@@ -189,6 +203,31 @@ let start = "alle"; try{ start = localStorage.getItem("filter") || "alle" }catch
 if(!CATS[start]) start = "alle";
 document.querySelectorAll("#filters button").forEach(x => x.setAttribute("aria-pressed", x.dataset.f===start ? "true":"false"));
 render(start);
+
+// Terugknop: eerst het filter terugzetten, daarna twee keer drukken om af te sluiten
+let toastTimer, guardTimer;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true }, 2000);
+}
+history.pushState({ app: "digidavestore" }, "");
+window.addEventListener("popstate", () => {
+  const active = document.querySelector('#filters button[aria-pressed="true"]');
+  if (active && active.dataset.f !== "alle") {
+    document.querySelector('#filters button[data-f="alle"]').click();
+    history.pushState({ app: "digidavestore" }, "");
+    return;
+  }
+  // Geen extra stap terugzetten: binnen 2 seconden nog eens terug sluit de app echt af
+  toast("Druk nog een keer op terug om af te sluiten");
+  clearTimeout(guardTimer);
+  guardTimer = setTimeout(() => history.pushState({ app: "digidavestore" }, ""), 2000);
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+}
 </script>
 </body>
 </html>
