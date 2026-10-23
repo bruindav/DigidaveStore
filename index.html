@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>digidave projecten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+/* Layout: één kolom met een kop, filterchips en per categorie een raster van projectkaarten. Huisstijl digidave: navy, amber, papier. */
+:root{
+  --bg:#f6f3ec; --surface:#fffdf8; --ink:#14213a; --muted:#5b6478; --line:#e2dccd;
+  --accent:#b8740f; --accent-ink:#ffffff; --navy:#1b2b4b; --chip:#ece6d8;
+  --live:#2f7d4f; --proto:#7a5a12;
+  --display:"IBM Plex Serif",Georgia,serif; --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1729; --surface:#16213a; --ink:#ece7dc; --muted:#a3abbd; --line:#26324f;
+  --accent:#e9a63a; --accent-ink:#1a1206; --navy:#c9d3ea; --chip:#1f2b47; --live:#6cc58f; --proto:#e3c06a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1729; --surface:#16213a; --ink:#ece7dc; --muted:#a3abbd; --line:#26324f;
+  --accent:#e9a63a; --accent-ink:#1a1206; --navy:#c9d3ea; --chip:#1f2b47; --live:#6cc58f; --proto:#e3c06a; color-scheme:dark}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:grid;gap:10px;margin-bottom:28px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
+.lead{margin:0;max-width:62ch;color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 32px}
+.filters button{font:500 13px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 14px;border-radius:999px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--bg)}
+.filters button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section{margin-bottom:40px}
+section h2{display:flex;align-items:baseline;gap:10px;font-family:var(--display);font-weight:500;font-size:21px;margin:0 0 4px;color:var(--navy)}
+section h2 .count{font-family:var(--mono);font-size:12px;color:var(--muted)}
+section > p{margin:0 0 16px;color:var(--muted);font-size:14px;max-width:70ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.card{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;min-width:0}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card h3{margin:0;font-size:17px;font-weight:600;line-height:1.3}
+.status{flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:4px;border:1px solid currentColor}
+.status.live{color:var(--live)}
+.status.proto{color:var(--proto)}
+.card p{margin:0;color:var(--ink);font-size:14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.tags span{font-family:var(--mono);font-size:11px;background:var(--chip);color:var(--muted);padding:2px 7px;border-radius:4px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.open{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:14px;text-decoration:none;padding:8px 14px;border-radius:6px}
+.open:hover{filter:brightness(1.05)}
+.repo{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.repo:hover{color:var(--ink)}
+.nolink{font-size:13px;color:var(--muted);font-style:italic}
+footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:no-preference){.open{transition:filter .15s}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">digidave · DigidaveStore</div>
+    <h1>Mijn projecten</h1>
+    <p class="lead">Een overzicht van de apps en prototypes die ik samen met AI heb gebouwd. Klik op <strong>Open app</strong> om een project direct te starten.</p>
+  </header>
+
+  <nav class="filters" aria-label="Filter op categorie" id="filters">
+    <button type="button" data-f="alle" aria-pressed="true">Alle</button>
+    <button type="button" data-f="werk" aria-pressed="false">Scheepvaart &amp; incidenten</button>
+    <button type="button" data-f="vrijwillig" aria-pressed="false">Vrijwilligers &amp; vereniging</button>
+    <button type="button" data-f="thuis" aria-pressed="false">Thuis &amp; financiën</button>
+    <button type="button" data-f="hulp" aria-pressed="false">Handige tools</button>
+    <button type="button" data-f="persoonlijk" aria-pressed="false">Persoonlijk</button>
+  </nav>
+
+  <main id="main"></main>
+
+  <footer>Alle apps draaien in de browser via GitHub Pages. Sommige apps vragen om in te loggen.</footer>
+</div>
+
+<script>
+const GH = "https://github.com/bruindav/";
+const PAGES = "https://bruindav.github.io/";
+const CATS = {
+  werk: { title: "Scheepvaart & incidenten", intro: "Prototypes voor het registreren en afhandelen van gebeurtenissen op de vaarweg, bedoeld om oplossingsrichtingen te verkennen en met gebruikers te toetsen." },
+  vrijwillig: { title: "Vrijwilligers & vereniging", intro: "Apps die in de praktijk worden gebruikt door vrijwilligers en een vereniging van eigenaars." },
+  thuis: { title: "Thuis & financiën", intro: "Persoonlijke apps voor agenda, tuin, financiën en administratie." },
+  hulp: { title: "Handige tools", intro: "Kleine hulpmiddelen voor dagelijks gebruik." },
+  persoonlijk: { title: "Persoonlijk", intro: "Pagina's voor speciale gelegenheden en mensen die me dierbaar zijn." }
+};
+const P = [
+  { cat:"werk", name:"Incidenten Registratie", repo:"Incident", status:"proto",
+    desc:"Registratie van incidenten, stremmingen en storingen op de vaarweg, met locatiezoeker van PDOK, RWS-kaarten, protocolstappen en een dag/nachtmodus.",
+    tags:["React","Leaflet","PDOK"] },
+  { cat:"werk", name:"Operationeel Portaal Scheepvaart", status:"proto",
+    desc:"Uitgebreid prototype met modules voor Melding, Storing, Overtreding, Watermanagement, Stremming en Incident, inclusief tijdlijn, protocollen en een dienstjournaal.",
+    tags:["HTML/JS","Leaflet","OpenSeaMap"], nolink:"Lokaal prototype, niet online" },
+  { cat:"werk", name:"GRS Database Viewer", status:"proto",
+    desc:"Analyseert Excel-exports van incidenten, storingen en stremmingen in de browser, met dashboards, filters, tijdlijn en een AVG-bewuste PDF-export.",
+    tags:["SheetJS","HTML/JS"], nolink:"Lokaal prototype, niet online" },
+  { cat:"werk", name:"Mobiel Verkeersleider", status:"proto",
+    desc:"Demo met dienstjournaal, bemanningsbeheer en een routekaart voor de mobiele verkeersleider.",
+    tags:["HTML/JS","Leaflet"], nolink:"Lokaal prototype, niet online" },
+  { cat:"werk", name:"Feature Analyse", repo:"Problem-Discovery", status:"proto",
+    desc:"AI-interviewtool die in zeven fases een klantvraag uitvraagt en er een werkdocument van maakt met waardehypothese, scope, acceptatiecriteria en actiepunten.",
+    tags:["React","Claude API","Cloudflare"], nolink:"Draait op Cloudflare, zie de repo" },
+
+  { cat:"vrijwillig", name:"HoornaarZoeken", repo:"HornetApp", status:"live",
+    desc:"App voor vrijwilligers die Aziatische hoornaars opsporen. Leg waarnemingen en vliegrichtingen vast op de kaart en zoek samen in realtime naar het nest.",
+    tags:["Firebase","Leaflet","PWA"] },
+  { cat:"vrijwillig", name:"VvE Administratie", repo:"vve-administratie", status:"live",
+    desc:"Leden-, bijdrage- en boekhoudadministratie voor een vereniging van eigenaars, met resultatenrekening, balans en begroting.",
+    tags:["Firebase","HTML/JS"] },
+  { cat:"vrijwillig", name:"VvE e-learning", repo:"vve-e-learning", status:"live",
+    desc:"E-learningplatform voor VvE-bestuursleden met modules over financiën, bestuur, onderhoud en meer, inclusief quizvragen.",
+    tags:["Firebase","HTML/JS"] },
+
+  { cat:"thuis", name:"MyAgenda", repo:"MyAgenda", status:"live",
+    desc:"Gedeelde gezinsagenda met maand-, week- en dagweergave, takenlijst, roostermodule en een dagelijks ochtendoverzicht via Telegram en e-mail.",
+    tags:["Firebase","PWA","GitHub Actions"] },
+  { cat:"thuis", name:"Mijn Tuin", repo:"mijntuinplanten", status:"live",
+    desc:"Houd je tuinplanten bij op een zelf getekende plattegrond, met plantherkenning en een jaarkalender voor bloei en snoei.",
+    tags:["Firebase","SVG"] },
+  { cat:"thuis", name:"Pensioenplanner", repo:"PensioenBerekenen", status:"live",
+    desc:"Leest pensioenoverzichten in en berekent het inkomen vanaf de pensioendatum, bruto en netto, inclusief AOW, lijfrentes, spaargeld en woning.",
+    tags:["React","IndexedDB"] },
+  { cat:"thuis", name:"Box 3 Rendement", repo:"werkelijkRendement", status:"live",
+    desc:"Berekent het werkelijk rendement in box 3 per jaar per bank en belegging, en vergelijkt dat met het forfaitaire rendement voor de aangifte.",
+    tags:["Firebase","HTML/JS"] },
+  { cat:"thuis", name:"AutoKosten", repo:"AutoKosten", status:"live",
+    desc:"Brengt alle vaste en variabele autokosten in kaart, inclusief kosten per kilometer, en vergelijkt die met privé of zakelijk leasen.",
+    tags:["React","RDW","CBS"] },
+  { cat:"thuis", name:"MuziekApp", repo:"MuziekApp", status:"live",
+    desc:"Muziekbibliotheek voor je cd's en platen. Scan de barcode en de gegevens worden opgezocht via MusicBrainz en Discogs.",
+    tags:["Firebase","PWA"] },
+  { cat:"thuis", name:"Mijn Zaken", repo:"mypersonal", status:"live",
+    desc:"Een beveiligde kluis voor belangrijke informatie die een ander nodig heeft als je het zelf niet meer kunt vertellen.",
+    tags:["Firebase","Versleuteld"] },
+
+  { cat:"hulp", name:"Locatietracker", repo:"locatietracker", status:"live",
+    desc:"Toont tijdens het wandelen je locatie en looprichting op de kaart, met het spoor van de gelopen route.",
+    tags:["Leaflet","Lokaal"] },
+  { cat:"hulp", name:"QR Lezer", repo:"qr-lezer", status:"live",
+    desc:"Leest QR-codes uit een afbeelding, zonder reclame en zonder kosten.",
+    tags:["HTML/JS"] },
+  { cat:"hulp", name:"Zonzoeker", repo:"zonzoeker", status:"live",
+    desc:"Vergelijk Europese steden op actueel zonnig weer, met per stad een 10-daagse verwachting.",
+    tags:["HTML/JS","Weer-API"] },
+  { cat:"persoonlijk", name:"In memoriam Hester", repo:"Hester", status:"live",
+    desc:"Herdenkingspagina voor een goede vriendin.",
+    tags:["HTML"] },
+  { cat:"persoonlijk", name:"Familieweekend Oldenburg", repo:"verassingsweekend", status:"live",
+    desc:"Reisverslag van het verrassingsweekend naar Oldenburg, met reisdagboek, stamboom en familiegeschiedenis.",
+    tags:["HTML"] }
+];
+
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function card(p){
+  const status = p.status === "live" ? '<span class="status live">Online</span>' : '<span class="status proto">Prototype</span>';
+  const live = p.repo && !p.nolink;
+  const actions = [
+    live ? `<a class="open" href="${PAGES}${p.repo}/" target="_blank" rel="noopener">Open app ↗</a>` : `<span class="nolink">${esc(p.nolink||"")}</span>`,
+    p.repo ? `<a class="repo" href="${GH}${p.repo}" target="_blank" rel="noopener">code</a>` : ""
+  ].join("");
+  return `<article class="card">
+    <div class="card-top"><h3>${esc(p.name)}</h3>${status}</div>
+    <p>${esc(p.desc)}</p>
+    <div class="tags">${p.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
+    <div class="actions">${actions}</div>
+  </article>`;
+}
+function render(f){
+  const main = document.getElementById("main");
+  main.innerHTML = Object.keys(CATS).filter(k => f==="alle" || f===k).map(k => {
+    const items = P.filter(p => p.cat===k);
+    return `<section aria-labelledby="h-${k}"><h2 id="h-${k}">${esc(CATS[k].title)}<span class="count">${items.length}</span></h2><p>${esc(CATS[k].intro)}</p><div class="grid">${items.map(card).join("")}</div></section>`;
+  }).join("");
+}
+document.getElementById("filters").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  document.querySelectorAll("#filters button").forEach(x => x.setAttribute("aria-pressed", x===b ? "true":"false"));
+  render(b.dataset.f);
+  try{ localStorage.setItem("filter", b.dataset.f) }catch(_){}
+});
+let start = "alle"; try{ start = localStorage.getItem("filter") || "alle" }catch(_){}
+if(!CATS[start]) start = "alle";
+document.querySelectorAll("#filters button").forEach(x => x.setAttribute("aria-pressed", x.dataset.f===start ? "true":"false"));
+render(start);
+</script>
+</body>
+</html>
