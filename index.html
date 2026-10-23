@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>digidave projecten</title>
+<title>DigidaveStore</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
 <style>
@@ -62,7 +62,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">digidave · DigidaveStore</div>
+    <div class="eyebrow">digidave</div>
     <h1>Mijn projecten</h1>
     <p class="lead">Een overzicht van de apps en prototypes die ik samen met AI heb gebouwd. Klik op <strong>Open app</strong> om een project direct te starten.</p>
   </header>
@@ -78,7 +78,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font
 
   <main id="main"></main>
 
-  <footer>Alle apps draaien in de browser via GitHub Pages. Sommige apps vragen om in te loggen.</footer>
+  <footer>Alle apps draaien in de browser. Voor sommige apps moet je eerst inloggen.</footer>
 </div>
 
 <script>
@@ -93,7 +93,7 @@ const CATS = {
 };
 const P = [
   { cat:"werk", name:"Incidenten Registratie", repo:"Incident", status:"proto",
-    desc:"Registratie van incidenten, stremmingen en storingen op de vaarweg, met locatiezoeker van PDOK, RWS-kaarten, protocolstappen en een dag/nachtmodus.",
+    desc:"Registratie van incidenten, stremmingen en storingen op de vaarweg, met een locatiezoeker via PDOK, kaarten van Rijkswaterstaat, protocolstappen en een dag- en nachtmodus.",
     tags:["React","Leaflet","PDOK"] },
   { cat:"werk", name:"Operationeel Portaal Scheepvaart", status:"proto",
     desc:"Uitgebreid prototype met modules voor Melding, Storing, Overtreding, Watermanagement, Stremming en Incident, inclusief tijdlijn, protocollen en een dienstjournaal.",
@@ -105,8 +105,8 @@ const P = [
     desc:"Demo met dienstjournaal, bemanningsbeheer en een routekaart voor de mobiele verkeersleider.",
     tags:["HTML/JS","Leaflet"], nolink:"Lokaal prototype, niet online" },
   { cat:"werk", name:"Feature Analyse", repo:"Problem-Discovery", status:"proto",
-    desc:"AI-interviewtool die in zeven fases een klantvraag uitvraagt en er een werkdocument van maakt met waardehypothese, scope, acceptatiecriteria en actiepunten.",
-    tags:["React","Claude API","Cloudflare"], nolink:"Draait op Cloudflare, zie de repo" },
+    desc:"Interviewtool die met AI in zeven stappen een klantvraag helder krijgt. Het resultaat is een werkdocument met waardehypothese, scope, acceptatiecriteria en actiepunten.",
+    tags:["React","Claude API","Cloudflare"], nolink:"Draait op Cloudflare, niet via deze pagina" },
 
   { cat:"vrijwillig", name:"HoornaarZoeken", repo:"HornetApp", status:"live",
     desc:"App voor vrijwilligers die Aziatische hoornaars opsporen. Leg waarnemingen en vliegrichtingen vast op de kaart en zoek samen in realtime naar het nest.",
@@ -115,29 +115,29 @@ const P = [
     desc:"Leden-, bijdrage- en boekhoudadministratie voor een vereniging van eigenaars, met resultatenrekening, balans en begroting.",
     tags:["Firebase","HTML/JS"] },
   { cat:"vrijwillig", name:"VvE e-learning", repo:"vve-e-learning", status:"live",
-    desc:"E-learningplatform voor VvE-bestuursleden met modules over financiën, bestuur, onderhoud en meer, inclusief quizvragen.",
+    desc:"E-learningplatform voor VvE-bestuursleden, met modules over onder meer financiën, bestuur en onderhoud, en toetsvragen per module.",
     tags:["Firebase","HTML/JS"] },
 
   { cat:"thuis", name:"MyAgenda", repo:"MyAgenda", status:"live",
-    desc:"Gedeelde gezinsagenda met maand-, week- en dagweergave, takenlijst, roostermodule en een dagelijks ochtendoverzicht via Telegram en e-mail.",
+    desc:"Gedeelde agenda voor thuis met maand-, week- en dagweergave, een takenlijst, een roostermodule en elke ochtend een overzicht via Telegram en e-mail.",
     tags:["Firebase","PWA","GitHub Actions"] },
   { cat:"thuis", name:"Mijn Tuin", repo:"mijntuinplanten", status:"live",
-    desc:"Houd je tuinplanten bij op een zelf getekende plattegrond, met plantherkenning en een jaarkalender voor bloei en snoei.",
+    desc:"Houd je tuinplanten bij op een zelfgetekende plattegrond, met plantherkenning en een jaarkalender voor bloei en snoei.",
     tags:["Firebase","SVG"] },
   { cat:"thuis", name:"Pensioenplanner", repo:"PensioenBerekenen", status:"live",
-    desc:"Leest pensioenoverzichten in en berekent het inkomen vanaf de pensioendatum, bruto en netto, inclusief AOW, lijfrentes, spaargeld en woning.",
+    desc:"Leest je pensioenoverzichten in en berekent je inkomen vanaf de pensioendatum, bruto en netto, met AOW, lijfrentes, spaargeld en de waarde van je woning.",
     tags:["React","IndexedDB"] },
-  { cat:"thuis", name:"Box 3 Rendement", repo:"werkelijkRendement", status:"live",
-    desc:"Berekent het werkelijk rendement in box 3 per jaar per bank en belegging, en vergelijkt dat met het forfaitaire rendement voor de aangifte.",
+  { cat:"thuis", name:"Box 3 Rendement", repo:"werkelijkRendement", url:"https://werkelijkrendement.web.app/", status:"live",
+    desc:"Berekent per jaar het werkelijke rendement in box 3, per bank en per belegging, en vergelijkt dat met het forfaitaire rendement voor de aangifte.",
     tags:["Firebase","HTML/JS"] },
   { cat:"thuis", name:"AutoKosten", repo:"AutoKosten", status:"live",
     desc:"Brengt alle vaste en variabele autokosten in kaart, inclusief kosten per kilometer, en vergelijkt die met privé of zakelijk leasen.",
     tags:["React","RDW","CBS"] },
   { cat:"thuis", name:"MuziekApp", repo:"MuziekApp", status:"live",
-    desc:"Muziekbibliotheek voor je cd's en platen. Scan de barcode en de gegevens worden opgezocht via MusicBrainz en Discogs.",
+    desc:"Houd je verzameling cd's en platen bij. Scan de barcode, en artiest, titel en jaar worden automatisch opgezocht via MusicBrainz en Discogs.",
     tags:["Firebase","PWA"] },
-  { cat:"thuis", name:"Mijn Zaken", repo:"mypersonal", status:"live",
-    desc:"Een beveiligde kluis voor belangrijke informatie die een ander nodig heeft als je het zelf niet meer kunt vertellen.",
+  { cat:"thuis", name:"Mijn Zaken", repo:"mypersonal", url:"https://raw.githack.com/bruindav/mypersonal/b91d3f99e8dff746f62b3dd04938da06e2082ab5/index.html", label:"Open testversie", status:"proto",
+    desc:"Beveiligde kluis voor belangrijke gegevens die een ander nodig heeft als ik het zelf niet meer kan vertellen, zoals adressen en bankzaken.",
     tags:["Firebase","Versleuteld"] },
 
   { cat:"hulp", name:"Locatietracker", repo:"locatietracker", status:"live",
@@ -147,10 +147,10 @@ const P = [
     desc:"Leest QR-codes uit een afbeelding, zonder reclame en zonder kosten.",
     tags:["HTML/JS"] },
   { cat:"hulp", name:"Zonzoeker", repo:"zonzoeker", status:"live",
-    desc:"Vergelijk Europese steden op actueel zonnig weer, met per stad een 10-daagse verwachting.",
+    desc:"Vergelijkt Europese steden op het actuele weer en laat zien waar de zon schijnt, met per stad een verwachting voor tien dagen.",
     tags:["HTML/JS","Weer-API"] },
   { cat:"persoonlijk", name:"In memoriam Hester", repo:"Hester", status:"live",
-    desc:"Herdenkingspagina voor een goede vriendin.",
+    desc:"Herdenkingspagina voor mijn vriendin Hester.",
     tags:["HTML"] },
   { cat:"persoonlijk", name:"Familieweekend Oldenburg", repo:"verassingsweekend", status:"live",
     desc:"Reisverslag van het verrassingsweekend naar Oldenburg, met reisdagboek, stamboom en familiegeschiedenis.",
@@ -160,10 +160,10 @@ const P = [
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function card(p){
   const status = p.status === "live" ? '<span class="status live">Online</span>' : '<span class="status proto">Prototype</span>';
-  const live = p.repo && !p.nolink;
+  const href = p.url || (p.repo && !p.nolink ? PAGES + p.repo + "/" : "");
   const actions = [
-    live ? `<a class="open" href="${PAGES}${p.repo}/" target="_blank" rel="noopener">Open app ↗</a>` : `<span class="nolink">${esc(p.nolink||"")}</span>`,
-    p.repo ? `<a class="repo" href="${GH}${p.repo}" target="_blank" rel="noopener">code</a>` : ""
+    href ? `<a class="open" href="${href}" target="_blank" rel="noopener">${esc(p.label || "Open app")} ↗</a>` : `<span class="nolink">${esc(p.nolink||"")}</span>`,
+    p.repo ? `<a class="repo" href="${GH}${p.repo}" target="_blank" rel="noopener">Code</a>` : ""
   ].join("");
   return `<article class="card">
     <div class="card-top"><h3>${esc(p.name)}</h3>${status}</div>
