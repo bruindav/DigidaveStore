@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-8: screenshots MyAgenda (privégegevens vervaagd) -->
+<!-- fix-9: reacties en reviews per app, met antwoord van de beheerder -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -66,6 +66,42 @@ body.admin .v-pick{display:inline-flex;align-items:center;gap:8px;font-size:14px
 .v-pick input{width:18px;height:18px;accent-color:#e9a63a;margin:0}
 .v-msg{font-size:13px;color:#e9a63a;min-height:1.2em;text-align:center}
 @media (max-width:560px){.viewer button.nav{position:absolute;top:50%;transform:translateY(-50%)}.viewer button.prev{left:max(8px,env(safe-area-inset-left,0px))}.viewer button.next{right:max(8px,env(safe-area-inset-right,0px))}}
+.rev-btn{margin-left:auto;background:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font:500 13px var(--body);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.rev-btn:hover{border-color:var(--accent)}
+.rev-btn .st{color:var(--accent)}
+.rev-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+dialog.sheet{border:0;padding:0;width:min(560px,100%);max-height:min(88vh,100%);margin:auto;border-radius:14px;background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog.sheet::backdrop{background:rgba(6,10,20,.6)}
+@media (max-width:560px){dialog.sheet{margin:auto 0 0;border-radius:14px 14px 0 0;max-height:92vh}}
+.sheet-inner{display:grid;gap:14px;padding:18px max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px))}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.sheet-head h3{margin:0;font-family:var(--display);font-weight:600;font-size:20px;color:var(--navy)}
+.sheet-head p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.sheet .x{background:var(--chip);border:0;border-radius:999px;width:36px;height:36px;font-size:16px;color:var(--ink);cursor:pointer;flex:none}
+.rv-list{display:grid;gap:10px}
+.rv{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:6px;background:var(--bg)}
+.rv-meta{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:13px;color:var(--muted)}
+.rv-meta strong{color:var(--ink);font-size:14px}
+.rv-stars{color:var(--accent);letter-spacing:1px}
+.rv p{margin:0;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.rv-reply{margin-top:4px;border-left:3px solid var(--accent);padding:6px 10px;background:var(--surface);border-radius:0 8px 8px 0;font-size:14px}
+.rv-reply b{display:block;font-size:12px;color:var(--accent);font-weight:600;margin-bottom:2px}
+.rv-tools{display:flex;gap:12px}
+.rv-tools button,.linkbtn{background:none;border:0;padding:0;font:500 13px var(--body);color:var(--muted);text-decoration:underline dotted;cursor:pointer}
+.rv-tools button:hover,.linkbtn:hover{color:var(--ink)}
+.rv-empty{color:var(--muted);font-size:14px;margin:0}
+.rv-form{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.rv-form h4{margin:0;font-size:15px}
+.stars{display:flex;gap:2px}
+.stars button{background:none;border:0;font-size:26px;line-height:1;color:var(--line);cursor:pointer;padding:2px}
+.stars button.on{color:var(--accent)}
+.rv-form textarea,.rv textarea{width:100%;min-height:84px;resize:vertical;font:14px/1.5 var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.rv-form textarea:focus,.rv textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.rv-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:8px 14px;font:600 14px var(--body);cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+.rv-note{font-size:12px;color:var(--muted)}
+.rv-msg{font-size:13px;color:var(--accent);min-height:1.2em}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:var(--bg);font-size:14px;padding:10px 16px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center;z-index:20}
 h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
 .lead{margin:0;max-width:62ch;color:var(--muted)}
@@ -128,6 +164,14 @@ footer button:hover{color:var(--ink)}
         <label class="v-pick"><input type="checkbox" id="v-pick"> Toon in voorbeeld</label>
         <div class="v-msg" id="v-msg" aria-live="polite"></div>
       </div>
+    </div>
+  </dialog>
+
+  <dialog class="sheet" id="rev" aria-labelledby="rev-title">
+    <div class="sheet-inner">
+      <div class="sheet-head"><div><h3 id="rev-title"></h3><p id="rev-sum"></p></div><button class="x" id="rev-close" type="button" aria-label="Sluiten">✕</button></div>
+      <div class="rv-list" id="rev-list"></div>
+      <div class="rv-form" id="rev-form"></div>
     </div>
   </dialog>
 
@@ -218,6 +262,21 @@ const P = [
     tags:["HTML"] }
 ];
 
+// Reacties per app (gevuld vanuit Firebase)
+window.REV = window.REV || {};
+const appId = p => (p.repo || p.name).toLowerCase().replace(/[^a-z0-9]+/g, "-");
+function revStats(p){
+  const list = window.REV[appId(p)] || [];
+  const rated = list.filter(r => r.rating > 0);
+  const avg = rated.length ? rated.reduce((a,r)=>a+r.rating,0) / rated.length : 0;
+  return { n: list.length, avg, rated: rated.length };
+}
+function revLabel(p){
+  const { n, avg, rated } = revStats(p);
+  if (!n) return "Reactie geven";
+  const st = rated ? `<span class="st">★</span> ${avg.toFixed(1).replace(".", ",")} · ` : "";
+  return `${st}${n} ${n === 1 ? "reactie" : "reacties"}`;
+}
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function card(p){
   const status = p.status === "live" ? '<span class="status live">Online</span>' : '<span class="status proto">Prototype</span>';
@@ -232,7 +291,7 @@ function card(p){
     ${p.shots ? `<button type="button" class="peek" aria-expanded="false">Toon voorbeeld <span>(${p.shots.captions.length} screenshots)</span></button>
     <div class="shots" hidden data-app="${esc(p.name)}"></div>` : ""}
     <div class="tags">${p.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
-    <div class="actions">${actions}</div>
+    <div class="actions">${actions}<button type="button" class="rev-btn" data-app="${esc(p.name)}">${revLabel(p)}</button></div>
   </article>`;
 }
 function render(f){
@@ -328,6 +387,75 @@ let tx = null;
 viewer.addEventListener("touchstart", e => { tx = e.touches[0].clientX }, { passive: true });
 viewer.addEventListener("touchend", e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) { vIdx += dx < 0 ? 1 : -1; showShot() } tx = null });
 
+// Reacties-venster
+const revDlg = document.getElementById("rev");
+let revApp = null, revStars = 0, replyOpen = null;
+const fmtDate = d => d ? d.toLocaleDateString("nl-NL", { day:"numeric", month:"long", year:"numeric" }) : "zojuist";
+const starStr = n => "★".repeat(n) + "☆".repeat(5 - n);
+window.refreshReviews = () => {
+  document.querySelectorAll(".rev-btn").forEach(b => { const p = P.find(x => x.name === b.dataset.app); if (p) b.innerHTML = revLabel(p) });
+  if (revDlg.open) renderRev();
+};
+function renderRev(){
+  const p = revApp, list = window.REV[appId(p)] || [], st = revStats(p);
+  const me = window.currentUser, admin = document.body.classList.contains("admin");
+  document.getElementById("rev-title").textContent = p.name;
+  document.getElementById("rev-sum").textContent = st.n
+    ? `${st.n} ${st.n === 1 ? "reactie" : "reacties"}${st.rated ? ` · gemiddeld ${st.avg.toFixed(1).replace(".", ",")} van 5 sterren` : ""}`
+    : "Nog geen reacties. Wees de eerste!";
+  document.getElementById("rev-list").innerHTML = list.map(r => `
+    <article class="rv" data-id="${r.id}">
+      <div class="rv-meta"><strong>${esc(r.name || "Bezoeker")}</strong>${r.rating ? `<span class="rv-stars" aria-label="${r.rating} van 5 sterren">${starStr(r.rating)}</span>` : ""}<span>${fmtDate(r.created)}</span></div>
+      <p>${esc(r.text)}</p>
+      ${r.reply && r.reply.text ? `<div class="rv-reply"><b>Reactie van Dave</b>${esc(r.reply.text)}</div>` : ""}
+      ${admin && replyOpen === r.id ? `<textarea id="reply-text" maxlength="1000" aria-label="Je antwoord">${esc(r.reply?.text || "")}</textarea><div class="rv-row"><span class="rv-note">Laat leeg om je antwoord te verwijderen.</span><button type="button" class="btn" data-act="save-reply">Antwoord plaatsen</button></div>` : ""}
+      ${(admin || (me && me.uid === r.uid)) ? `<div class="rv-tools">${admin && replyOpen !== r.id ? `<button type="button" data-act="reply">${r.reply?.text ? "Antwoord wijzigen" : "Reageren"}</button>` : ""}<button type="button" data-act="delete">Verwijderen</button></div>` : ""}
+    </article>`).join("") || "";
+  const form = document.getElementById("rev-form");
+  if (!window.addReview) { form.innerHTML = '<p class="rv-note">Reacties zijn nu niet beschikbaar. Probeer het later opnieuw.</p>'; return; }
+  if (!me) { form.innerHTML = '<h4>Reactie of review geven</h4><p class="rv-note">Log in met je Google-account om een reactie te plaatsen. Alleen je voornaam wordt getoond.</p><div><button type="button" class="btn" data-act="login">Inloggen met Google</button></div>'; return; }
+  form.innerHTML = `<h4>Reactie of review geven</h4>
+    <div class="stars" role="radiogroup" aria-label="Sterren (optioneel)">${[1,2,3,4,5].map(n => `<button type="button" role="radio" aria-checked="${revStars===n}" aria-label="${n} ${n===1?"ster":"sterren"}" data-star="${n}" class="${n<=revStars?"on":""}">★</button>`).join("")}</div>
+    <textarea id="rev-text" maxlength="1000" placeholder="Wat vind je van deze app? Tips en ideeën zijn ook welkom."></textarea>
+    <div class="rv-row"><span class="rv-note">Je plaatst als ${esc(window.firstName(me))} · <button type="button" class="linkbtn" data-act="logout">Uitloggen</button></span><button type="button" class="btn" data-act="post">Plaatsen</button></div>
+    <div class="rv-msg" id="rev-msg" aria-live="polite"></div>`;
+}
+document.getElementById("main").addEventListener("click", e => {
+  const b = e.target.closest(".rev-btn"); if (!b) return;
+  revApp = P.find(p => p.name === b.dataset.app); revStars = 0; replyOpen = null;
+  renderRev(); revDlg.showModal();
+});
+document.getElementById("rev-close").onclick = () => revDlg.close();
+revDlg.addEventListener("click", async e => {
+  if (e.target === revDlg) { revDlg.close(); return; }
+  const star = e.target.closest("[data-star]");
+  if (star) { const n = +star.dataset.star; revStars = revStars === n ? 0 : n; document.querySelectorAll("#rev-form [data-star]").forEach(s => { const k = +s.dataset.star; s.classList.toggle("on", k <= revStars); s.setAttribute("aria-checked", k === revStars) }); return; }
+  const act = e.target.closest("[data-act]")?.dataset.act; if (!act) return;
+  const id = e.target.closest(".rv")?.dataset.id;
+  try {
+    if (act === "login") await window.loginGoogle();
+    if (act === "logout") await window.logout();
+    if (act === "post") {
+      const t = document.getElementById("rev-text").value.trim(), msg = document.getElementById("rev-msg");
+      if (!t) { msg.textContent = "Schrijf eerst je reactie."; return; }
+      e.target.disabled = true; msg.textContent = "Bezig met plaatsen…";
+      await window.addReview(appId(revApp), revStars, t);
+      revStars = 0;
+    }
+    if (act === "reply") { replyOpen = id; renderRev(); document.getElementById("reply-text")?.focus(); }
+    if (act === "save-reply") { await window.replyReview(id, document.getElementById("reply-text").value.trim()); replyOpen = null; }
+    if (act === "delete") {
+      if (e.target.dataset.sure !== "1") { e.target.dataset.sure = "1"; e.target.textContent = "Zeker weten? Tik nog een keer"; return; }
+      await window.deleteReview(id);
+    }
+  } catch (err) {
+    console.warn(err);
+    const msg = document.getElementById("rev-msg");
+    if (msg) msg.textContent = "Dat lukte niet. Probeer het opnieuw.";
+    else alert("Dat lukte niet. Probeer het opnieuw.");
+  }
+});
+
 // Terugknop: eerst het filter terugzetten, daarna twee keer drukken om af te sluiten
 let toastTimer, guardTimer;
 function toast(msg){
@@ -338,6 +466,7 @@ function toast(msg){
 history.pushState({ app: "digidavestore" }, "");
 window.addEventListener("popstate", () => {
   if (viewer.open) { viewer.close(); history.pushState({ app: "digidavestore" }, ""); return; }
+  if (revDlg.open) { revDlg.close(); history.pushState({ app: "digidavestore" }, ""); return; }
   const active = document.querySelector('#filters button[aria-pressed="true"]');
   if (active && active.dataset.f !== "alle") {
     document.querySelector('#filters button[data-f="alle"]').click();
@@ -355,9 +484,9 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 <script type="module">
-// Firebase: voorbeeldkeuze lezen (iedereen) en opslaan (alleen beheerder)
+// Firebase: voorbeeldkeuze en reacties. Lezen mag iedereen, reageren na inloggen, beheren alleen Dave.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, deleteField, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const ADMIN = "davedebruin123@gmail.com";
@@ -380,20 +509,48 @@ try {
 
 window.saveVB = (dir, sel) => setDoc(ref, { [dir]: sel }, { merge: true });
 
+// Reacties
+const revCol = collection(db, "reviews");
+async function loadReviews(){
+  try {
+    const snap = await getDocs(query(revCol, orderBy("created", "desc")));
+    const by = {};
+    snap.forEach(d => { const r = d.data(); (by[r.app] ||= []).push({ id: d.id, ...r, created: r.created?.toDate?.() || null }); });
+    window.REV = by;
+  } catch (e) { console.warn("Reacties niet geladen", e); }
+  window.refreshReviews();
+}
+window.firstName = u => ((u.displayName || u.email || "Bezoeker").split(" ")[0]).slice(0, 40);
+window.addReview = async (appKey, rating, text) => {
+  const u = auth.currentUser; if (!u) throw new Error("niet ingelogd");
+  await addDoc(revCol, { app: appKey, uid: u.uid, name: window.firstName(u), rating, text: text.slice(0, 1000), created: serverTimestamp() });
+  await loadReviews();
+};
+window.replyReview = async (id, text) => {
+  await updateDoc(doc(db, "reviews", id), { reply: text ? { text: text.slice(0, 1000), at: serverTimestamp() } : deleteField() });
+  await loadReviews();
+};
+window.deleteReview = async id => { await deleteDoc(doc(db, "reviews", id)); await loadReviews(); };
+loadReviews();
+
 const bar = document.getElementById("admin-bar");
 function renderBar(user){
   const isAdmin = !!user && user.email === ADMIN && user.emailVerified;
   document.body.classList.toggle("admin", isAdmin);
-  if (!user) { bar.innerHTML = '<button type="button" id="admin-btn">Beheer</button>'; }
-  else if (!isAdmin) { bar.innerHTML = 'Geen beheerrechten · <button type="button" id="logout-btn">Uitloggen</button>'; }
-  else { bar.innerHTML = 'Beheer aan: kies in de pop-up wat in het voorbeeld staat · <button type="button" id="logout-btn">Uitloggen</button>'; }
+  window.currentUser = user || null;
+  if (!user) { bar.innerHTML = '<button type="button" id="admin-btn">Inloggen</button>'; }
+  else if (!isAdmin) { bar.innerHTML = `Ingelogd als ${window.firstName(user).replace(/[<>&"]/g, "")} · <button type="button" id="logout-btn">Uitloggen</button>`; }
+  else { bar.innerHTML = 'Beheer aan: kies voorbeelden in de pop-up en beantwoord reacties · <button type="button" id="logout-btn">Uitloggen</button>'; }
+  window.refreshReviews();
 }
-bar.addEventListener("click", async e => {
-  if (e.target.id === "admin-btn") {
-    const provider = new GoogleAuthProvider();
-    try { await signInWithPopup(auth, provider); }
-    catch (err) { if (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment") signInWithRedirect(auth, provider); }
-  }
+window.loginGoogle = async () => {
+  const provider = new GoogleAuthProvider();
+  try { await signInWithPopup(auth, provider); }
+  catch (err) { if (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment") await signInWithRedirect(auth, provider); else throw err; }
+};
+window.logout = () => signOut(auth);
+bar.addEventListener("click", e => {
+  if (e.target.id === "admin-btn") window.loginGoogle().catch(() => {});
   if (e.target.id === "logout-btn") signOut(auth);
 });
 getRedirectResult(auth).catch(() => {});

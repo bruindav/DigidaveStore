@@ -1,13 +1,36 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Voorbeeldkeuze van DigidaveStore: iedereen mag lezen, alleen Dave mag wijzigen
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'davedebruin123@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    // Voorbeeldkeuze: iedereen mag lezen, alleen Dave mag wijzigen
     match /config/{docId} {
       allow read: if true;
-      allow write: if request.auth != null
-                   && request.auth.token.email == 'davedebruin123@gmail.com'
-                   && request.auth.token.email_verified == true;
+      allow write: if isAdmin();
     }
+
+    // Reacties: iedereen mag lezen, ingelogde bezoekers mogen plaatsen,
+    // alleen Dave mag antwoorden, verwijderen mag Dave of de schrijver zelf
+    match /reviews/{id} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['app', 'uid', 'name', 'rating', 'text', 'created'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.app is string && request.resource.data.app.size() <= 60
+        && request.resource.data.name is string && request.resource.data.name.size() <= 40
+        && request.resource.data.rating is int && request.resource.data.rating >= 0 && request.resource.data.rating <= 5
+        && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
+        && request.resource.data.created == request.time;
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reply']);
+      allow delete: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
