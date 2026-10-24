@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-5: meer screenshots in de pop-up, max. 3 in het voorbeeld via vinkje, MuziekApp-screenshots -->
+<!-- fix-6: voorbeeldkeuze opgeslagen in Firebase, alleen de beheerder kan de vinkjes zetten -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -61,7 +61,8 @@ dialog.viewer::backdrop{background:rgba(6,10,20,.97)}
 .viewer-stage img{max-height:100%;max-width:min(100%,520px);object-fit:contain;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5);background:#111}
 .viewer-foot{display:grid;justify-items:center;gap:8px}
 .viewer-cap{text-align:center;font-size:14px;opacity:.9}
-.v-pick{display:inline-flex;align-items:center;gap:8px;font-size:14px;background:rgba(255,255,255,.1);padding:6px 12px;border-radius:999px;cursor:pointer}
+.v-pick{display:none;}
+body.admin .v-pick{display:inline-flex;align-items:center;gap:8px;font-size:14px;background:rgba(255,255,255,.1);padding:6px 12px;border-radius:999px;cursor:pointer}
 .v-pick input{width:18px;height:18px;accent-color:#e9a63a;margin:0}
 .v-msg{font-size:13px;color:#e9a63a;min-height:1.2em;text-align:center}
 @media (max-width:560px){.viewer button.nav{position:absolute;top:50%;transform:translateY(-50%)}.viewer button.prev{left:max(8px,env(safe-area-inset-left,0px))}.viewer button.next{right:max(8px,env(safe-area-inset-right,0px))}}
@@ -92,7 +93,9 @@ section > p{margin:0 0 16px;color:var(--muted);font-size:14px;max-width:70ch}
 .repo{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
 .repo:hover{color:var(--ink)}
 .nolink{font-size:13px;color:var(--muted);font-style:italic}
-footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:13px}
+footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px}
+footer button{background:none;border:0;padding:0;font:inherit;color:var(--muted);text-decoration:underline dotted;cursor:pointer}
+footer button:hover{color:var(--ink)}
 @media (prefers-reduced-motion:no-preference){.open{transition:filter .15s}}
 </style>
 </head>
@@ -130,7 +133,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <footer>Alle apps draaien in de browser. Voor sommige apps moet je eerst inloggen.</footer>
+  <footer><span>Alle apps draaien in de browser. Voor sommige apps moet je eerst inloggen.</span><span id="admin-bar"><button type="button" id="admin-btn">Beheer</button></span></footer>
 </div>
 
 <script>
@@ -247,15 +250,23 @@ if(!CATS[start]) start = "alle";
 document.querySelectorAll("#filters button").forEach(x => x.setAttribute("aria-pressed", x.dataset.f===start ? "true":"false"));
 render(start);
 
-// Keuze welke screenshots in het voorbeeld staan (max. 3), bewaard in deze browser
+// Keuze welke screenshots in het voorbeeld staan (max. 3). Opgeslagen in Firebase, alleen de beheerder kan dit wijzigen.
 const MAX_VB = 3;
+window.VB = window.VB || {};
 function getSel(p){
-  let sel = null;
-  try { sel = JSON.parse(localStorage.getItem("voorbeeld:" + p.shots.dir)) } catch(_) {}
-  if (!Array.isArray(sel) || !sel.length) sel = p.shots.preview || [0,1,2];
+  let sel = window.VB[p.shots.dir];
+  if (!Array.isArray(sel) || !sel.length) sel = [0,1,2];
   return sel.filter(i => i < p.shots.captions.length).slice(0, MAX_VB).sort((a,b)=>a-b);
 }
-function setSel(p, sel){ try { localStorage.setItem("voorbeeld:" + p.shots.dir, JSON.stringify(sel)) } catch(_) {} }
+function setSel(p, sel){
+  window.VB[p.shots.dir] = sel;
+  const msg = document.getElementById("v-msg");
+  if (!window.saveVB) { msg.textContent = "Niet opgeslagen: geen verbinding met de database."; return; }
+  window.saveVB(p.shots.dir, sel)
+    .then(() => { msg.textContent = `Opgeslagen · ${sel.length} van ${MAX_VB} in het voorbeeld` })
+    .catch(() => { msg.textContent = "Opslaan mislukt. Ben je ingelogd als beheerder?" });
+}
+window.refreshStrips = () => document.querySelectorAll(".shots").forEach(st => { if (!st.hidden) fillStrip(st) });
 function fillStrip(strip){
   const p = P.find(x => x.name === strip.dataset.app);
   strip.innerHTML = getSel(p).map(i => `<button type="button" data-app="${esc(p.name)}" data-i="${i}" aria-label="Screenshot: ${esc(p.shots.captions[i])}"><img src="./screenshots/${p.shots.dir}/${i+1}-klein.jpg" alt="" width="68" height="121"></button>`).join("");
@@ -300,8 +311,9 @@ document.getElementById("v-pick").addEventListener("change", e => {
     if (sel.length <= 1) { e.target.checked = true; msg.textContent = "Er moet minstens één screenshot in het voorbeeld staan."; return; }
     sel = sel.filter(i => i !== vIdx);
   }
-  sel.sort((a,b)=>a-b); setSel(vApp, sel);
-  msg.textContent = `${sel.length} van ${MAX_VB} in het voorbeeld`;
+  sel.sort((a,b)=>a-b);
+  msg.textContent = "Bezig met opslaan…";
+  setSel(vApp, sel);
   document.querySelectorAll(".shots").forEach(st => { if (st.dataset.app === vApp.name && !st.hidden) fillStrip(st) });
 });
 document.getElementById("v-prev").onclick = () => { vIdx--; showShot() };
@@ -338,6 +350,51 @@ window.addEventListener("popstate", () => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
 }
+</script>
+<script type="module">
+// Firebase: voorbeeldkeuze lezen (iedereen) en opslaan (alleen beheerder)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const ADMIN = "davedebruin123@gmail.com";
+const app = initializeApp({
+  apiKey: ["AIzaSyC03bDPrj","bZiUy_MafI0IX6","EJ5nBlU8yHU"].join(""),
+  authDomain: "digidavestore.firebaseapp.com",
+  projectId: "digidavestore",
+  storageBucket: "digidavestore.firebasestorage.app",
+  messagingSenderId: "309191965265",
+  appId: "1:309191965265:web:db850793c78ddc11869670"
+});
+const db = getFirestore(app);
+const auth = getAuth(app);
+const ref = doc(db, "config", "voorbeeld");
+
+try {
+  const snap = await getDoc(ref);
+  if (snap.exists()) { Object.assign(window.VB, snap.data()); window.refreshStrips(); }
+} catch (e) { console.warn("Voorbeeldkeuze niet geladen", e); }
+
+window.saveVB = (dir, sel) => setDoc(ref, { [dir]: sel }, { merge: true });
+
+const bar = document.getElementById("admin-bar");
+function renderBar(user){
+  const isAdmin = !!user && user.email === ADMIN && user.emailVerified;
+  document.body.classList.toggle("admin", isAdmin);
+  if (!user) { bar.innerHTML = '<button type="button" id="admin-btn">Beheer</button>'; }
+  else if (!isAdmin) { bar.innerHTML = 'Geen beheerrechten · <button type="button" id="logout-btn">Uitloggen</button>'; }
+  else { bar.innerHTML = 'Beheer aan: kies in de pop-up wat in het voorbeeld staat · <button type="button" id="logout-btn">Uitloggen</button>'; }
+}
+bar.addEventListener("click", async e => {
+  if (e.target.id === "admin-btn") {
+    const provider = new GoogleAuthProvider();
+    try { await signInWithPopup(auth, provider); }
+    catch (err) { if (err.code === "auth/popup-blocked" || err.code === "auth/operation-not-supported-in-this-environment") signInWithRedirect(auth, provider); }
+  }
+  if (e.target.id === "logout-btn") signOut(auth);
+});
+getRedirectResult(auth).catch(() => {});
+onAuthStateChanged(auth, renderBar);
 </script>
 </body>
 </html>
