@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-3: Feature Analyse bijgewerkt met werkende link, screenshots met pop-up -->
+<!-- fix-4: screenshots pas zichtbaar na "Toon voorbeeld", AutoKosten-screenshots toegevoegd -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -32,6 +32,7 @@
 *{box-sizing:border-box}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0}
+[hidden]{display:none!important}
 img{max-width:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
 .wrap{max-width:1080px;margin:0 auto;padding-block:40px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -39,6 +40,11 @@ header{display:grid;gap:10px;margin-bottom:28px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand img{width:36px;height:36px}
 .brand span{font-family:var(--body);font-weight:500;font-size:20px;letter-spacing:.01em;color:var(--navy)}
+.peek{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:2px 0;font:500 13px var(--body);color:var(--accent);cursor:pointer}
+.peek::before{content:"▸";display:inline-block;transition:transform .15s}
+.peek[aria-expanded="true"]::before{transform:rotate(90deg)}
+.peek span{color:var(--muted);font-weight:400}
+.peek:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 .shots{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
 .shots button{flex:none;padding:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--chip);cursor:zoom-in;line-height:0}
 .shots img{width:68px;height:121px;object-fit:cover;display:block}
@@ -171,7 +177,8 @@ const P = [
     tags:["Firebase","HTML/JS"] },
   { cat:"thuis", name:"AutoKosten", repo:"AutoKosten", status:"live",
     desc:"Brengt alle vaste en variabele autokosten in kaart, inclusief kosten per kilometer, en vergelijkt die met privé of zakelijk leasen.",
-    tags:["React","RDW","CBS"] },
+    tags:["React","RDW","CBS"],
+    shots:{ dir:"autokosten", captions:["Kosten per categorie en per kilometer","Alle kostenposten per jaar","Eigen auto vergeleken met leasen"] } },
   { cat:"thuis", name:"MuziekApp", repo:"MuziekApp", status:"live",
     desc:"Houd je verzameling cd's en platen bij. Scan de barcode, en artiest, titel en jaar worden automatisch opgezocht via MusicBrainz en Discogs.",
     tags:["Firebase","PWA"] },
@@ -207,7 +214,8 @@ function card(p){
   return `<article class="card">
     <div class="card-top"><h3>${esc(p.name)}</h3>${status}</div>
     <p>${esc(p.desc)}</p>
-    ${p.shots ? `<div class="shots">${p.shots.captions.map((c,i)=>`<button type="button" data-app="${esc(p.name)}" data-i="${i}" aria-label="Screenshot: ${esc(c)}"><img src="./screenshots/${p.shots.dir}/${i+1}-klein.jpg" alt="" loading="lazy" width="68" height="121"></button>`).join("")}</div>` : ""}
+    ${p.shots ? `<button type="button" class="peek" aria-expanded="false">Toon voorbeeld <span>(${p.shots.captions.length})</span></button>
+    <div class="shots" hidden>${p.shots.captions.map((c,i)=>`<button type="button" data-app="${esc(p.name)}" data-i="${i}" aria-label="Screenshot: ${esc(c)}"><img data-src="./screenshots/${p.shots.dir}/${i+1}-klein.jpg" alt="" width="68" height="121"></button>`).join("")}</div>` : ""}
     <div class="tags">${p.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
     <div class="actions">${actions}</div>
   </article>`;
@@ -244,6 +252,15 @@ function showShot(){
   document.getElementById("v-prev").hidden = document.getElementById("v-next").hidden = n < 2;
 }
 document.getElementById("main").addEventListener("click", e => {
+  const pk = e.target.closest(".peek");
+  if (pk) {
+    const open = pk.getAttribute("aria-expanded") !== "true";
+    pk.setAttribute("aria-expanded", open);
+    pk.firstChild.textContent = open ? "Verberg voorbeeld " : "Toon voorbeeld ";
+    const strip = pk.nextElementSibling; strip.hidden = !open;
+    strip.querySelectorAll("img[data-src]").forEach(i => { i.src = i.dataset.src; i.removeAttribute("data-src") });
+    return;
+  }
   const b = e.target.closest(".shots button"); if(!b) return;
   vApp = P.find(p => p.name === b.dataset.app); vIdx = +b.dataset.i;
   showShot(); viewer.showModal();

@@ -1,5 +1,5 @@
 // sw.js — fix-2
-const CACHE = 'digidavestore-v3';
+const CACHE = 'digidavestore-v4';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/logo-mark.png', './favicon.png'];
 
 self.addEventListener('install', e => {
