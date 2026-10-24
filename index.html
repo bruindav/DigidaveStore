@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-13: screenshots Zonzoeker -->
+<!-- fix-14: Foto-app toegevoegd, beschrijving Locatietracker in lijn met de help -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -127,6 +127,7 @@ section > p{margin:0 0 16px;color:var(--muted);font-size:14px;max-width:70ch}
 .status{flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:4px;border:1px solid currentColor}
 .status.live{color:var(--live)}
 .status.proto{color:var(--proto)}
+.status.local{color:var(--muted)}
 .card p{margin:0;color:var(--ink);font-size:14px}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
 .tags span{font-family:var(--mono);font-size:11px;background:var(--chip);color:var(--muted);padding:2px 7px;border-radius:4px}
@@ -248,13 +249,16 @@ const P = [
     desc:"Houd je verzameling cd's en platen bij. Scan de barcode, en artiest, titel en jaar worden automatisch opgezocht via MusicBrainz en Discogs.",
     tags:["Firebase","PWA"],
     shots:{ dir:"muziekapp", captions:["Alle albums met een A-tot-Z-index","Album met tracklijst en uitgaven","Album toevoegen met de barcodescanner","Beheer: streamingdienst, import en opberglocaties"] } },
+  { cat:"thuis", name:"MyPhoto", status:"lokaal",
+    desc:"Fotobeheer voor een bibliotheek van ruim 48.000 foto's. Maak albums, tag, draai en verbeter foto's, spoor dubbele foto's op en zet gekozen albums in Google Drive. Met een beveiligde albumviewer om je foto's op de telefoon te bekijken.",
+    tags:["Python","Flask","SQLite","Google Drive"], nolink:"Draait lokaal op de laptop" },
   { cat:"thuis", name:"Mijn Zaken", repo:"mypersonal", url:"https://raw.githack.com/bruindav/mypersonal/b91d3f99e8dff746f62b3dd04938da06e2082ab5/index.html", label:"Open testversie", status:"proto",
     desc:"Beveiligde kluis voor belangrijke gegevens die een ander nodig heeft als ik het zelf niet meer kan vertellen, zoals adressen en bankzaken.",
     tags:["Firebase","Versleuteld"] },
 
   { cat:"hulp", name:"Locatietracker", repo:"locatietracker", status:"live",
-    desc:"Toont tijdens het wandelen je locatie en looprichting op de kaart, met het spoor van de gelopen route.",
-    tags:["Leaflet","Lokaal"],
+    desc:"Laat altijd zien waar je bent en legt de route vast die je loopt, fietst of rijdt. Plan een route langs wegen en paden met afstand en hoogtemeters; de pijl op de kaart kleurt rood als je de verkeerde kant op gaat. Kies uit kaarten met bewegwijzerde wandel- en fietsroutes. Alles blijft op je eigen apparaat, en voor betrouwbaar opnemen is er ook een Android-app.",
+    tags:["Leaflet","Lokaal","Android"],
     shots:{ dir:"locatietracker", captions:["Route plannen met punten, afstand en hoogtemeters","Spoor opnemen tijdens het wandelen","Kaarttype, vervoerswijze, spoor en route","Opgeslagen routes en sporen"] } },
   { cat:"hulp", name:"QR Lezer", repo:"qr-lezer", status:"live",
     desc:"Leest QR-codes uit een foto, een screenshot of een plaatje dat je deelt vanuit WhatsApp of mail. Links, wifi-gegevens en tekst staan meteen klaar om te openen of te kopiëren. Zonder reclame, en je foto's blijven op je eigen toestel.",
@@ -298,7 +302,7 @@ function revLabel(p){
 }
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function card(p){
-  const status = p.status === "live" ? '<span class="status live">Online</span>' : '<span class="status proto">Prototype</span>';
+  const status = p.status === "live" ? '<span class="status live">Online</span>' : p.status === "lokaal" ? '<span class="status local">Lokaal</span>' : '<span class="status proto">Prototype</span>';
   const href = p.url || (p.repo && !p.nolink ? PAGES + p.repo + "/" : "");
   const actions = [
     href ? `<a class="open" href="${href}" target="_blank" rel="noopener">${esc(p.label || "Open app")} ↗</a>` : `<span class="nolink">${esc(p.nolink||"")}</span>`,
