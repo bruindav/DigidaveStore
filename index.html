@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-4: screenshots pas zichtbaar na "Toon voorbeeld", AutoKosten-screenshots toegevoegd -->
+<!-- fix-5: meer screenshots in de pop-up, max. 3 in het voorbeeld via vinkje, MuziekApp-screenshots -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -50,7 +50,7 @@ header{display:grid;gap:10px;margin-bottom:28px}
 .shots img{width:68px;height:121px;object-fit:cover;display:block}
 .shots button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 dialog.viewer{border:0;padding:0;background:transparent;max-width:100vw;max-height:100vh;width:100%;height:100%;margin:0}
-dialog.viewer::backdrop{background:rgba(6,10,20,.88)}
+dialog.viewer::backdrop{background:rgba(6,10,20,.97)}
 .viewer-inner{height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));color:#f3efe6}
 .viewer-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .viewer-top strong{font-size:16px;font-weight:600}
@@ -59,7 +59,11 @@ dialog.viewer::backdrop{background:rgba(6,10,20,.88)}
 .viewer button.x:focus-visible,.viewer button.nav:focus-visible{outline:2px solid #e9a63a}
 .viewer-stage{display:flex;align-items:center;justify-content:center;gap:12px;min-height:0}
 .viewer-stage img{max-height:100%;max-width:min(100%,520px);object-fit:contain;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5);background:#111}
+.viewer-foot{display:grid;justify-items:center;gap:8px}
 .viewer-cap{text-align:center;font-size:14px;opacity:.9}
+.v-pick{display:inline-flex;align-items:center;gap:8px;font-size:14px;background:rgba(255,255,255,.1);padding:6px 12px;border-radius:999px;cursor:pointer}
+.v-pick input{width:18px;height:18px;accent-color:#e9a63a;margin:0}
+.v-msg{font-size:13px;color:#e9a63a;min-height:1.2em;text-align:center}
 @media (max-width:560px){.viewer button.nav{position:absolute;top:50%;transform:translateY(-50%)}.viewer button.prev{left:max(8px,env(safe-area-inset-left,0px))}.viewer button.next{right:max(8px,env(safe-area-inset-right,0px))}}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:var(--bg);font-size:14px;padding:10px 16px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center;z-index:20}
 h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
@@ -116,7 +120,11 @@ footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font
     <div class="viewer-inner">
       <div class="viewer-top"><div><strong id="v-title"></strong> <span id="v-count"></span></div><button class="x" id="v-close" type="button" aria-label="Sluiten">✕</button></div>
       <div class="viewer-stage"><button class="nav prev" id="v-prev" type="button" aria-label="Vorige">‹</button><img id="v-img" alt=""><button class="nav next" id="v-next" type="button" aria-label="Volgende">›</button></div>
-      <div class="viewer-cap" id="v-cap"></div>
+      <div class="viewer-foot">
+        <div class="viewer-cap" id="v-cap"></div>
+        <label class="v-pick"><input type="checkbox" id="v-pick"> Toon in voorbeeld</label>
+        <div class="v-msg" id="v-msg" aria-live="polite"></div>
+      </div>
     </div>
   </dialog>
 
@@ -181,7 +189,8 @@ const P = [
     shots:{ dir:"autokosten", captions:["Kosten per categorie en per kilometer","Alle kostenposten per jaar","Eigen auto vergeleken met leasen"] } },
   { cat:"thuis", name:"MuziekApp", repo:"MuziekApp", status:"live",
     desc:"Houd je verzameling cd's en platen bij. Scan de barcode, en artiest, titel en jaar worden automatisch opgezocht via MusicBrainz en Discogs.",
-    tags:["Firebase","PWA"] },
+    tags:["Firebase","PWA"],
+    shots:{ dir:"muziekapp", captions:["Alle albums met een A-tot-Z-index","Album met tracklijst en uitgaven","Album toevoegen met de barcodescanner","Beheer: streamingdienst, import en opberglocaties"] } },
   { cat:"thuis", name:"Mijn Zaken", repo:"mypersonal", url:"https://raw.githack.com/bruindav/mypersonal/b91d3f99e8dff746f62b3dd04938da06e2082ab5/index.html", label:"Open testversie", status:"proto",
     desc:"Beveiligde kluis voor belangrijke gegevens die een ander nodig heeft als ik het zelf niet meer kan vertellen, zoals adressen en bankzaken.",
     tags:["Firebase","Versleuteld"] },
@@ -214,8 +223,8 @@ function card(p){
   return `<article class="card">
     <div class="card-top"><h3>${esc(p.name)}</h3>${status}</div>
     <p>${esc(p.desc)}</p>
-    ${p.shots ? `<button type="button" class="peek" aria-expanded="false">Toon voorbeeld <span>(${p.shots.captions.length})</span></button>
-    <div class="shots" hidden>${p.shots.captions.map((c,i)=>`<button type="button" data-app="${esc(p.name)}" data-i="${i}" aria-label="Screenshot: ${esc(c)}"><img data-src="./screenshots/${p.shots.dir}/${i+1}-klein.jpg" alt="" width="68" height="121"></button>`).join("")}</div>` : ""}
+    ${p.shots ? `<button type="button" class="peek" aria-expanded="false">Toon voorbeeld <span>(${p.shots.captions.length} screenshots)</span></button>
+    <div class="shots" hidden data-app="${esc(p.name)}"></div>` : ""}
     <div class="tags">${p.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
     <div class="actions">${actions}</div>
   </article>`;
@@ -238,6 +247,20 @@ if(!CATS[start]) start = "alle";
 document.querySelectorAll("#filters button").forEach(x => x.setAttribute("aria-pressed", x.dataset.f===start ? "true":"false"));
 render(start);
 
+// Keuze welke screenshots in het voorbeeld staan (max. 3), bewaard in deze browser
+const MAX_VB = 3;
+function getSel(p){
+  let sel = null;
+  try { sel = JSON.parse(localStorage.getItem("voorbeeld:" + p.shots.dir)) } catch(_) {}
+  if (!Array.isArray(sel) || !sel.length) sel = p.shots.preview || [0,1,2];
+  return sel.filter(i => i < p.shots.captions.length).slice(0, MAX_VB).sort((a,b)=>a-b);
+}
+function setSel(p, sel){ try { localStorage.setItem("voorbeeld:" + p.shots.dir, JSON.stringify(sel)) } catch(_) {} }
+function fillStrip(strip){
+  const p = P.find(x => x.name === strip.dataset.app);
+  strip.innerHTML = getSel(p).map(i => `<button type="button" data-app="${esc(p.name)}" data-i="${i}" aria-label="Screenshot: ${esc(p.shots.captions[i])}"><img src="./screenshots/${p.shots.dir}/${i+1}-klein.jpg" alt="" width="68" height="121"></button>`).join("");
+}
+
 // Screenshot-viewer
 const viewer = document.getElementById("viewer");
 let vApp = null, vIdx = 0;
@@ -249,6 +272,8 @@ function showShot(){
   document.getElementById("v-cap").textContent = s.captions[vIdx];
   document.getElementById("v-title").textContent = vApp.name;
   document.getElementById("v-count").textContent = `${vIdx+1} / ${n}`;
+  document.getElementById("v-pick").checked = getSel(vApp).includes(vIdx);
+  document.getElementById("v-msg").textContent = "";
   document.getElementById("v-prev").hidden = document.getElementById("v-next").hidden = n < 2;
 }
 document.getElementById("main").addEventListener("click", e => {
@@ -258,12 +283,26 @@ document.getElementById("main").addEventListener("click", e => {
     pk.setAttribute("aria-expanded", open);
     pk.firstChild.textContent = open ? "Verberg voorbeeld " : "Toon voorbeeld ";
     const strip = pk.nextElementSibling; strip.hidden = !open;
-    strip.querySelectorAll("img[data-src]").forEach(i => { i.src = i.dataset.src; i.removeAttribute("data-src") });
+    if (open) fillStrip(strip);
     return;
   }
   const b = e.target.closest(".shots button"); if(!b) return;
   vApp = P.find(p => p.name === b.dataset.app); vIdx = +b.dataset.i;
   showShot(); viewer.showModal();
+});
+document.getElementById("v-pick").addEventListener("change", e => {
+  let sel = getSel(vApp);
+  const msg = document.getElementById("v-msg");
+  if (e.target.checked) {
+    if (sel.length >= MAX_VB) { e.target.checked = false; msg.textContent = `Er staan er al ${MAX_VB} in het voorbeeld. Haal er eerst een weg.`; return; }
+    sel.push(vIdx);
+  } else {
+    if (sel.length <= 1) { e.target.checked = true; msg.textContent = "Er moet minstens één screenshot in het voorbeeld staan."; return; }
+    sel = sel.filter(i => i !== vIdx);
+  }
+  sel.sort((a,b)=>a-b); setSel(vApp, sel);
+  msg.textContent = `${sel.length} van ${MAX_VB} in het voorbeeld`;
+  document.querySelectorAll(".shots").forEach(st => { if (st.dataset.app === vApp.name && !st.hidden) fillStrip(st) });
 });
 document.getElementById("v-prev").onclick = () => { vIdx--; showShot() };
 document.getElementById("v-next").onclick = () => { vIdx++; showShot() };
