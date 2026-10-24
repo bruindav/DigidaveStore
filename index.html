@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-9: reacties en reviews per app, met antwoord van de beheerder -->
+<!-- fix-10: ongelezen reacties zichtbaar voor de beheerder -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -102,6 +102,13 @@ dialog.sheet::backdrop{background:rgba(6,10,20,.6)}
 .btn:disabled{opacity:.5;cursor:default}
 .rv-note{font-size:12px;color:var(--muted)}
 .rv-msg{font-size:13px;color:var(--accent);min-height:1.2em}
+.unread-pill{display:none;justify-self:start;align-items:center;gap:8px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:6px 14px;font:600 13px var(--body);cursor:pointer}
+body.admin .unread-pill.has{display:inline-flex}
+.unread-pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.rev-btn .new{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:1px 7px;font-size:11px;font-weight:600}
+.rev-btn.has-new{border-color:var(--accent)}
+.rv.unread{border-color:var(--accent)}
+.rv .tag-new{background:var(--accent);color:var(--accent-ink);border-radius:4px;padding:0 6px;font-size:11px;font-weight:600}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:var(--bg);font-size:14px;padding:10px 16px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center;z-index:20}
 h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
 .lead{margin:0;max-width:62ch;color:var(--muted)}
@@ -141,6 +148,7 @@ footer button:hover{color:var(--ink)}
   <header>
     <div class="brand"><img src="./icons/logo-mark.png" alt="" width="36" height="36"><span>digidave</span></div>
     <h1>Mijn projecten</h1>
+    <button type="button" class="unread-pill" id="unread-pill"></button>
     <p class="lead">Een overzicht van de apps en prototypes die ik samen met AI heb gebouwd. Klik op <strong>Open app</strong> om een project direct te starten.</p>
   </header>
 
@@ -271,11 +279,20 @@ function revStats(p){
   const avg = rated.length ? rated.reduce((a,r)=>a+r.rating,0) / rated.length : 0;
   return { n: list.length, avg, rated: rated.length };
 }
+// Ongelezen reacties (alleen voor de beheerder): alles na het laatste moment dat Dave het venster opende
+window.SEEN = window.SEEN || {};
+const isAdminNow = () => document.body.classList.contains("admin");
+function unreadList(p){
+  if (!isAdminNow()) return [];
+  const seen = window.SEEN[appId(p)] || 0, me = window.currentUser?.uid;
+  return (window.REV[appId(p)] || []).filter(r => r.created && r.created.getTime() > seen && r.uid !== me);
+}
 function revLabel(p){
   const { n, avg, rated } = revStats(p);
+  const u = unreadList(p).length, nw = u ? ` <span class="new">${u} nieuw</span>` : "";
   if (!n) return "Reactie geven";
   const st = rated ? `<span class="st">★</span> ${avg.toFixed(1).replace(".", ",")} · ` : "";
-  return `${st}${n} ${n === 1 ? "reactie" : "reacties"}`;
+  return `${st}${n} ${n === 1 ? "reactie" : "reacties"}${nw}`;
 }
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function card(p){
@@ -392,10 +409,25 @@ const revDlg = document.getElementById("rev");
 let revApp = null, revStars = 0, replyOpen = null;
 const fmtDate = d => d ? d.toLocaleDateString("nl-NL", { day:"numeric", month:"long", year:"numeric" }) : "zojuist";
 const starStr = n => "★".repeat(n) + "☆".repeat(5 - n);
+let revUnread = new Set();
 window.refreshReviews = () => {
-  document.querySelectorAll(".rev-btn").forEach(b => { const p = P.find(x => x.name === b.dataset.app); if (p) b.innerHTML = revLabel(p) });
+  document.querySelectorAll(".rev-btn").forEach(b => { const p = P.find(x => x.name === b.dataset.app); if (p) { b.innerHTML = revLabel(p); b.classList.toggle("has-new", unreadList(p).length > 0) } });
+  const total = P.reduce((a,p) => a + unreadList(p).length, 0), pill = document.getElementById("unread-pill");
+  pill.classList.toggle("has", total > 0);
+  pill.textContent = `${total} ongelezen ${total === 1 ? "reactie" : "reacties"}`;
   if (revDlg.open) renderRev();
 };
+function openRev(p){
+  revApp = p; revStars = 0; replyOpen = null;
+  revUnread = new Set(unreadList(p).map(r => r.id));
+  renderRev(); revDlg.showModal();
+  if (isAdminNow() && window.markSeen) { window.SEEN[appId(p)] = Date.now(); window.markSeen(appId(p)).catch(() => {}); window.refreshReviews(); }
+}
+document.getElementById("unread-pill").addEventListener("click", () => {
+  const p = P.find(x => unreadList(x).length > 0); if (!p) return;
+  const f = document.querySelector('#filters button[data-f="alle"]'); if (f.getAttribute("aria-pressed") !== "true") f.click();
+  openRev(p);
+});
 function renderRev(){
   const p = revApp, list = window.REV[appId(p)] || [], st = revStats(p);
   const me = window.currentUser, admin = document.body.classList.contains("admin");
@@ -404,8 +436,8 @@ function renderRev(){
     ? `${st.n} ${st.n === 1 ? "reactie" : "reacties"}${st.rated ? ` · gemiddeld ${st.avg.toFixed(1).replace(".", ",")} van 5 sterren` : ""}`
     : "Nog geen reacties. Wees de eerste!";
   document.getElementById("rev-list").innerHTML = list.map(r => `
-    <article class="rv" data-id="${r.id}">
-      <div class="rv-meta"><strong>${esc(r.name || "Bezoeker")}</strong>${r.rating ? `<span class="rv-stars" aria-label="${r.rating} van 5 sterren">${starStr(r.rating)}</span>` : ""}<span>${fmtDate(r.created)}</span></div>
+    <article class="rv${revUnread.has(r.id) ? " unread" : ""}" data-id="${r.id}">
+      <div class="rv-meta">${revUnread.has(r.id) ? '<span class="tag-new">Nieuw</span>' : ""}<strong>${esc(r.name || "Bezoeker")}</strong>${r.rating ? `<span class="rv-stars" aria-label="${r.rating} van 5 sterren">${starStr(r.rating)}</span>` : ""}<span>${fmtDate(r.created)}</span></div>
       <p>${esc(r.text)}</p>
       ${r.reply && r.reply.text ? `<div class="rv-reply"><b>Reactie van Dave</b>${esc(r.reply.text)}</div>` : ""}
       ${admin && replyOpen === r.id ? `<textarea id="reply-text" maxlength="1000" aria-label="Je antwoord">${esc(r.reply?.text || "")}</textarea><div class="rv-row"><span class="rv-note">Laat leeg om je antwoord te verwijderen.</span><button type="button" class="btn" data-act="save-reply">Antwoord plaatsen</button></div>` : ""}
@@ -422,8 +454,7 @@ function renderRev(){
 }
 document.getElementById("main").addEventListener("click", e => {
   const b = e.target.closest(".rev-btn"); if (!b) return;
-  revApp = P.find(p => p.name === b.dataset.app); revStars = 0; replyOpen = null;
-  renderRev(); revDlg.showModal();
+  openRev(P.find(p => p.name === b.dataset.app));
 });
 document.getElementById("rev-close").onclick = () => revDlg.close();
 revDlg.addEventListener("click", async e => {
@@ -530,6 +561,13 @@ window.replyReview = async (id, text) => {
   await updateDoc(doc(db, "reviews", id), { reply: text ? { text: text.slice(0, 1000), at: serverTimestamp() } : deleteField() });
   await loadReviews();
 };
+const seenRef = doc(db, "config", "gelezen");
+async function loadSeen(){
+  try { const s = await getDoc(seenRef); if (s.exists()) Object.assign(window.SEEN, s.data()); } catch (e) { console.warn("Gelezen-status niet geladen", e); }
+  window.refreshReviews();
+}
+window.markSeen = appKey => setDoc(seenRef, { [appKey]: Date.now() }, { merge: true });
+loadSeen();
 window.deleteReview = async id => { await deleteDoc(doc(db, "reviews", id)); await loadReviews(); };
 loadReviews();
 
