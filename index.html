@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-2: webapp (manifest, service worker, terugknopbeveiliging, digidave-icoon) -->
+<!-- fix-3: Feature Analyse bijgewerkt met werkende link, screenshots met pop-up -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -39,6 +39,22 @@ header{display:grid;gap:10px;margin-bottom:28px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand img{width:36px;height:36px}
 .brand span{font-family:var(--body);font-weight:500;font-size:20px;letter-spacing:.01em;color:var(--navy)}
+.shots{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.shots button{flex:none;padding:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--chip);cursor:zoom-in;line-height:0}
+.shots img{width:68px;height:121px;object-fit:cover;display:block}
+.shots button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+dialog.viewer{border:0;padding:0;background:transparent;max-width:100vw;max-height:100vh;width:100%;height:100%;margin:0}
+dialog.viewer::backdrop{background:rgba(6,10,20,.88)}
+.viewer-inner{height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));color:#f3efe6}
+.viewer-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.viewer-top strong{font-size:16px;font-weight:600}
+.viewer-top span{font-family:var(--mono);font-size:12px;opacity:.75}
+.viewer button.x,.viewer button.nav{background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:999px;width:40px;height:40px;font-size:20px;cursor:pointer;flex:none}
+.viewer button.x:focus-visible,.viewer button.nav:focus-visible{outline:2px solid #e9a63a}
+.viewer-stage{display:flex;align-items:center;justify-content:center;gap:12px;min-height:0}
+.viewer-stage img{max-height:100%;max-width:min(100%,520px);object-fit:contain;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5);background:#111}
+.viewer-cap{text-align:center;font-size:14px;opacity:.9}
+@media (max-width:560px){.viewer button.nav{position:absolute;top:50%;transform:translateY(-50%)}.viewer button.prev{left:max(8px,env(safe-area-inset-left,0px))}.viewer button.next{right:max(8px,env(safe-area-inset-right,0px))}}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:var(--bg);font-size:14px;padding:10px 16px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center;z-index:20}
 h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
 .lead{margin:0;max-width:62ch;color:var(--muted)}
@@ -90,6 +106,14 @@ footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font
 
   <main id="main"></main>
 
+  <dialog class="viewer" id="viewer" aria-label="Screenshots">
+    <div class="viewer-inner">
+      <div class="viewer-top"><div><strong id="v-title"></strong> <span id="v-count"></span></div><button class="x" id="v-close" type="button" aria-label="Sluiten">✕</button></div>
+      <div class="viewer-stage"><button class="nav prev" id="v-prev" type="button" aria-label="Vorige">‹</button><img id="v-img" alt=""><button class="nav next" id="v-next" type="button" aria-label="Volgende">›</button></div>
+      <div class="viewer-cap" id="v-cap"></div>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <footer>Alle apps draaien in de browser. Voor sommige apps moet je eerst inloggen.</footer>
@@ -118,13 +142,14 @@ const P = [
   { cat:"werk", name:"Mobiel Verkeersleider", status:"proto",
     desc:"Demo met dienstjournaal, bemanningsbeheer en een routekaart voor de mobiele verkeersleider.",
     tags:["HTML/JS","Leaflet"], nolink:"Lokaal prototype, niet online" },
-  { cat:"werk", name:"Feature Analyse", repo:"Problem-Discovery", status:"proto",
-    desc:"Interviewtool die met AI in zeven stappen een klantvraag helder krijgt. Het resultaat is een werkdocument met waardehypothese, scope, acceptatiecriteria en actiepunten.",
-    tags:["React","Claude API","Cloudflare"], nolink:"Draait op Cloudflare, niet via deze pagina" },
+  { cat:"werk", name:"Feature Analyse", repo:"Problem-Discovery", url:"https://problem-discovery.davedebruin123-75f.workers.dev/", status:"proto",
+    desc:"Interviewtool die met AI in zeven stappen een feature helder krijgt: context, probleem, doel, gebruikers, scope, AVG en open vragen. Het resultaat is een werkdocument met waardehypothese, scope, acceptatiecriteria en actiepunten. Je kiest zelf welk AI-model meedenkt. Inloggen met Google, alleen voor genodigden.",
+    tags:["React","Claude API","Cloudflare Workers","Firebase"] },
 
   { cat:"vrijwillig", name:"HoornaarZoeken", repo:"HornetApp", status:"live",
     desc:"App voor vrijwilligers die Aziatische hoornaars opsporen. Leg waarnemingen en vliegrichtingen vast op de kaart en zoek samen in realtime naar het nest.",
-    tags:["Firebase","Leaflet","PWA"] },
+    tags:["Firebase","Leaflet","PWA"],
+    shots:{ dir:"hornetapp", captions:["Kaartoverzicht met waarnemingen","Eenvoudig iconen plaatsen","Overzicht per gemeente","Zichtlijn met stopwatch en kompas"] } },
   { cat:"vrijwillig", name:"VvE Administratie", repo:"vve-administratie", status:"live",
     desc:"Leden-, bijdrage- en boekhoudadministratie voor een vereniging van eigenaars, met resultatenrekening, balans en begroting.",
     tags:["Firebase","HTML/JS"] },
@@ -182,6 +207,7 @@ function card(p){
   return `<article class="card">
     <div class="card-top"><h3>${esc(p.name)}</h3>${status}</div>
     <p>${esc(p.desc)}</p>
+    ${p.shots ? `<div class="shots">${p.shots.captions.map((c,i)=>`<button type="button" data-app="${esc(p.name)}" data-i="${i}" aria-label="Screenshot: ${esc(c)}"><img src="./screenshots/${p.shots.dir}/${i+1}-klein.jpg" alt="" loading="lazy" width="68" height="121"></button>`).join("")}</div>` : ""}
     <div class="tags">${p.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
     <div class="actions">${actions}</div>
   </article>`;
@@ -204,6 +230,33 @@ if(!CATS[start]) start = "alle";
 document.querySelectorAll("#filters button").forEach(x => x.setAttribute("aria-pressed", x.dataset.f===start ? "true":"false"));
 render(start);
 
+// Screenshot-viewer
+const viewer = document.getElementById("viewer");
+let vApp = null, vIdx = 0;
+function showShot(){
+  const s = vApp.shots, n = s.captions.length;
+  vIdx = (vIdx + n) % n;
+  document.getElementById("v-img").src = `./screenshots/${s.dir}/${vIdx+1}.jpg`;
+  document.getElementById("v-img").alt = s.captions[vIdx];
+  document.getElementById("v-cap").textContent = s.captions[vIdx];
+  document.getElementById("v-title").textContent = vApp.name;
+  document.getElementById("v-count").textContent = `${vIdx+1} / ${n}`;
+  document.getElementById("v-prev").hidden = document.getElementById("v-next").hidden = n < 2;
+}
+document.getElementById("main").addEventListener("click", e => {
+  const b = e.target.closest(".shots button"); if(!b) return;
+  vApp = P.find(p => p.name === b.dataset.app); vIdx = +b.dataset.i;
+  showShot(); viewer.showModal();
+});
+document.getElementById("v-prev").onclick = () => { vIdx--; showShot() };
+document.getElementById("v-next").onclick = () => { vIdx++; showShot() };
+document.getElementById("v-close").onclick = () => viewer.close();
+viewer.addEventListener("click", e => { if (e.target.classList.contains("viewer-stage") || e.target.classList.contains("viewer-inner")) viewer.close() });
+viewer.addEventListener("keydown", e => { if (e.key === "ArrowLeft") { vIdx--; showShot() } if (e.key === "ArrowRight") { vIdx++; showShot() } });
+let tx = null;
+viewer.addEventListener("touchstart", e => { tx = e.touches[0].clientX }, { passive: true });
+viewer.addEventListener("touchend", e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) { vIdx += dx < 0 ? 1 : -1; showShot() } tx = null });
+
 // Terugknop: eerst het filter terugzetten, daarna twee keer drukken om af te sluiten
 let toastTimer, guardTimer;
 function toast(msg){
@@ -213,6 +266,7 @@ function toast(msg){
 }
 history.pushState({ app: "digidavestore" }, "");
 window.addEventListener("popstate", () => {
+  if (viewer.open) { viewer.close(); history.pushState({ app: "digidavestore" }, ""); return; }
   const active = document.querySelector('#filters button[aria-pressed="true"]');
   if (active && active.dataset.f !== "alle") {
     document.querySelector('#filters button[data-f="alle"]').click();
