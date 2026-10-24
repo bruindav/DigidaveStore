@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-15: screenshots VvE e-learning -->
+<!-- fix-16: flyer VvE e-learning, eigen standaardvoorbeeld per app -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -226,7 +226,7 @@ const P = [
   { cat:"vrijwillig", name:"VvE e-learning", repo:"vve-e-learning", status:"live",
     desc:"E-learningplatform voor VvE-bestuursleden, met modules over onder meer financiën, bestuur en onderhoud, en toetsvragen per module.",
     tags:["Firebase","HTML/JS"],
-    shots:{ dir:"vve-elearning", captions:["E-learning voor VvE-bestuurders","Basismodule: grip op de VvE-boekhouding","Verdiepingsmodule voor gevorderden","Onderdelen met voortgang per module","Uitleg met vuistregels","Controlevraag na elk onderdeel"] } },
+    shots:{ dir:"vve-elearning", preview:[0,2,3], captions:["Flyer: je bent bestuurder van je VvE geworden. Wat nu?","Flyer: alle modules op een rij","E-learning voor VvE-bestuurders","Basismodule: grip op de VvE-boekhouding","Verdiepingsmodule voor gevorderden","Onderdelen met voortgang per module","Uitleg met vuistregels","Controlevraag na elk onderdeel"] } },
 
   { cat:"thuis", name:"MyAgenda", repo:"MyAgenda", status:"live",
     desc:"Gedeelde agenda voor thuis met maand-, week- en dagweergave, een takenlijst, een roostermodule en elke ochtend een overzicht via Telegram en e-mail.",
@@ -341,7 +341,7 @@ const MAX_VB = 3;
 window.VB = window.VB || {};
 function getSel(p){
   let sel = window.VB[p.shots.dir];
-  if (!Array.isArray(sel) || !sel.length) sel = [0,1,2];
+  if (!Array.isArray(sel) || !sel.length) sel = p.shots.preview || [0,1,2];
   return sel.filter(i => i < p.shots.captions.length).slice(0, MAX_VB).sort((a,b)=>a-b);
 }
 function setSel(p, sel){
