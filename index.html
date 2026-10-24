@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-6: voorbeeldkeuze opgeslagen in Firebase, alleen de beheerder kan de vinkjes zetten -->
+<!-- fix-7: screenshots Mijn Tuin, 4e screenshot AutoKosten -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -179,7 +179,8 @@ const P = [
     tags:["Firebase","PWA","GitHub Actions"] },
   { cat:"thuis", name:"Mijn Tuin", repo:"mijntuinplanten", status:"live",
     desc:"Houd je tuinplanten bij op een zelfgetekende plattegrond, met plantherkenning en een jaarkalender voor bloei en snoei.",
-    tags:["Firebase","SVG"] },
+    tags:["Firebase","SVG"],
+    shots:{ dir:"mijntuin", captions:["Plantvakken van de voortuin","Alle planten met foto en plantvak","Kalender: wat bloeit er deze maand","Kalender: snoeien, bemesten en bloei per maand","Plant bewerken","Snoei- en bemestmaanden per plant"] } },
   { cat:"thuis", name:"Pensioenplanner", repo:"PensioenBerekenen", status:"live",
     desc:"Leest je pensioenoverzichten in en berekent je inkomen vanaf de pensioendatum, bruto en netto, met AOW, lijfrentes, spaargeld en de waarde van je woning.",
     tags:["React","IndexedDB"] },
@@ -189,7 +190,7 @@ const P = [
   { cat:"thuis", name:"AutoKosten", repo:"AutoKosten", status:"live",
     desc:"Brengt alle vaste en variabele autokosten in kaart, inclusief kosten per kilometer, en vergelijkt die met privé of zakelijk leasen.",
     tags:["React","RDW","CBS"],
-    shots:{ dir:"autokosten", captions:["Kosten per categorie en per kilometer","Alle kostenposten per jaar","Eigen auto vergeleken met leasen"] } },
+    shots:{ dir:"autokosten", captions:["Gegevens van de auto, met kentekenopzoeking via de RDW","Kosten per categorie en per kilometer","Alle kostenposten per jaar","Eigen auto vergeleken met leasen"] } },
   { cat:"thuis", name:"MuziekApp", repo:"MuziekApp", status:"live",
     desc:"Houd je verzameling cd's en platen bij. Scan de barcode, en artiest, titel en jaar worden automatisch opgezocht via MusicBrainz en Discogs.",
     tags:["Firebase","PWA"],
