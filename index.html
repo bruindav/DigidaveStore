@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-18: link "Meer…" naar de help-pagina van de app -->
+<!-- fix-19: help-links naar Zonzoeker en Foto App (#help) -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -252,7 +252,7 @@ const P = [
     desc:"Houd je verzameling cd's en platen bij. Scan de barcode, en artiest, titel en jaar worden automatisch opgezocht via MusicBrainz en Discogs.",
     tags:["Firebase","PWA"],
     shots:{ dir:"muziekapp", captions:["Alle albums met een A-tot-Z-index","Album met tracklijst en uitgaven","Album toevoegen met de barcodescanner","Beheer: streamingdienst, import en opberglocaties"] } },
-  { cat:"thuis", name:"MyPhoto", repo:"FotoOpruimen", label:"Open Foto App", status:"live",
+  { cat:"thuis", name:"MyPhoto", repo:"FotoOpruimen", help:"https://bruindav.github.io/FotoOpruimen/#help", label:"Open Foto App", status:"live",
     desc:"Fotobeheer voor een archief van zo'n 50.000 foto's, in twee delen. Op de laptop orden je albums, tag, draai en verbeter je foto's en spoor je dubbele foto's op. Met de Foto App op je telefoon bekijk je je foto's per jaar of album, ook als diavoorstelling op de tv via Chromecast, en ruim je op: markeer foto's als weg of houden en verplaats ze tussen albums. Er wordt nooit iets automatisch verwijderd; op de laptop controleer je eerst de lijst. Inloggen met Google, alleen voor eigen gebruik.",
     tags:["Python","Flask","SQLite","Google Drive","Chromecast"],
     shots:{ dir:"myphoto", captions:["Foto App: kies een jaar of map","Alle mappen van een jaar","Foto's bekijken, met diavoorstelling en naar de tv","Album met de beste foto's"] } },
@@ -268,7 +268,7 @@ const P = [
     desc:"Leest QR-codes uit een foto, een screenshot of een plaatje dat je deelt vanuit WhatsApp of mail. Links, wifi-gegevens en tekst staan meteen klaar om te openen of te kopiëren. Zonder reclame, en je foto's blijven op je eigen toestel.",
     tags:["PWA","jsQR","Lokaal"],
     shots:{ dir:"qrlezer", captions:["Startscherm: foto maken of afbeelding kiezen","Rekening met QR-code ontvangen in WhatsApp","Foto delen naar de QR Lezer","Betaallink uitgelezen, klaar om te openen"] } },
-  { cat:"hulp", name:"Zonzoeker", repo:"zonzoeker", status:"live",
+  { cat:"hulp", name:"Zonzoeker", repo:"zonzoeker", help:"https://bruindav.github.io/zonzoeker/#help", status:"live",
     desc:"Vergelijkt Europese steden op het actuele weer en laat zien waar de zon schijnt, met per stad een verwachting voor tien dagen.",
     tags:["HTML/JS","Weer-API"],
     shots:{ dir:"zonzoeker", captions:["Steden gerangschikt op zon en weinig regen","Neerslagradar met de steden op de kaart","Eigen groep, bijvoorbeeld Duitsland","Vertrekpunt en maximale reisafstand","Grotere steden zoeken binnen je reisafstand"] } },
