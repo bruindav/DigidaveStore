@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-17: MyPhoto bijgewerkt met de Foto App op de telefoon, met screenshots -->
+<!-- fix-18: link "Meer…" naar de help-pagina van de app -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -129,6 +129,8 @@ section > p{margin:0 0 16px;color:var(--muted);font-size:14px;max-width:70ch}
 .status.proto{color:var(--proto)}
 .status.local{color:var(--muted)}
 .card p{margin:0;color:var(--ink);font-size:14px}
+.card p .more{color:var(--accent);font-weight:500;text-decoration:none;white-space:nowrap}
+.card p .more:hover{text-decoration:underline}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
 .tags span{font-family:var(--mono);font-size:11px;background:var(--chip);color:var(--muted);padding:2px 7px;border-radius:4px}
 .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -216,7 +218,7 @@ const P = [
     desc:"Interviewtool die met AI in zeven stappen een feature helder krijgt: context, probleem, doel, gebruikers, scope, AVG en open vragen. Het resultaat is een werkdocument met waardehypothese, scope, acceptatiecriteria en actiepunten. Je kiest zelf welk AI-model meedenkt. Inloggen met Google, alleen voor genodigden.",
     tags:["React","Claude API","Cloudflare Workers","Firebase"] },
 
-  { cat:"vrijwillig", name:"HoornaarZoeken", repo:"HornetApp", status:"live",
+  { cat:"vrijwillig", name:"HoornaarZoeken", help:"https://bruindav.github.io/HornetApp/handleiding-vespafinder.html", repo:"HornetApp", status:"live",
     desc:"App voor vrijwilligers die Aziatische hoornaars opsporen. Leg waarnemingen en vliegrichtingen vast op de kaart en zoek samen in realtime naar het nest.",
     tags:["Firebase","Leaflet","PWA"],
     shots:{ dir:"hornetapp", captions:["Zichtlijnen met afstand en zoeksector naar het nest","Waarnemingen en nesten per wijk, met het menu van een icoon","Zichtlijnen vanaf lokpotten in de Vrijheidsbuurt","Beheer: overzicht per gemeente en wijk","Waarneming vastleggen","Nest geruimd registreren","Kaartoverzicht (Play Store)","Eenvoudig iconen plaatsen (Play Store)","Overzicht per gemeente (Play Store)","Zichtlijn met stopwatch en kompas (Play Store)"] } },
@@ -236,13 +238,13 @@ const P = [
     desc:"Houd je tuinplanten bij op een zelfgetekende plattegrond, met plantherkenning en een jaarkalender voor bloei en snoei.",
     tags:["Firebase","SVG"],
     shots:{ dir:"mijntuin", captions:["Plantvakken van de voortuin","Alle planten met foto en plantvak","Kalender: wat bloeit er deze maand","Kalender: snoeien, bemesten en bloei per maand","Plant bewerken","Snoei- en bemestmaanden per plant"] } },
-  { cat:"thuis", name:"Pensioenplanner", repo:"PensioenBerekenen", status:"live",
+  { cat:"thuis", name:"Pensioenplanner", help:"https://bruindav.github.io/PensioenBerekenen/#help", repo:"PensioenBerekenen", status:"live",
     desc:"Leest je pensioenoverzichten in en berekent je inkomen vanaf de pensioendatum, bruto en netto, met AOW, lijfrentes, spaargeld en de waarde van je woning.",
     tags:["React","IndexedDB"] },
-  { cat:"thuis", name:"Box 3 Rendement", repo:"werkelijkRendement", url:"https://werkelijkrendement.web.app/", status:"live",
+  { cat:"thuis", name:"Box 3 Rendement", help:"https://werkelijkrendement.web.app/help", repo:"werkelijkRendement", url:"https://werkelijkrendement.web.app/", status:"live",
     desc:"Berekent per jaar het werkelijke rendement in box 3, per bank en per belegging, en vergelijkt dat met het forfaitaire rendement voor de aangifte.",
     tags:["Firebase","HTML/JS"] },
-  { cat:"thuis", name:"AutoKosten", repo:"AutoKosten", status:"live",
+  { cat:"thuis", name:"AutoKosten", help:"https://bruindav.github.io/AutoKosten/help.html", repo:"AutoKosten", status:"live",
     desc:"Brengt alle vaste en variabele autokosten in kaart, inclusief kosten per kilometer, en vergelijkt die met privé of zakelijk leasen.",
     tags:["React","RDW","CBS"],
     shots:{ dir:"autokosten", captions:["Gegevens van de auto, met kentekenopzoeking via de RDW","Kosten per categorie en per kilometer","Alle kostenposten per jaar","Eigen auto vergeleken met leasen"] } },
@@ -258,11 +260,11 @@ const P = [
     desc:"Beveiligde kluis voor belangrijke gegevens die een ander nodig heeft als ik het zelf niet meer kan vertellen, zoals adressen en bankzaken.",
     tags:["Firebase","Versleuteld"] },
 
-  { cat:"hulp", name:"Locatietracker", repo:"locatietracker", status:"live",
+  { cat:"hulp", name:"Locatietracker", help:"https://bruindav.github.io/locatietracker/help.html", repo:"locatietracker", status:"live",
     desc:"Laat altijd zien waar je bent en legt de route vast die je loopt, fietst of rijdt. Plan een route langs wegen en paden met afstand en hoogtemeters; de pijl op de kaart kleurt rood als je de verkeerde kant op gaat. Kies uit kaarten met bewegwijzerde wandel- en fietsroutes. Alles blijft op je eigen apparaat, en voor betrouwbaar opnemen is er ook een Android-app.",
     tags:["Leaflet","Lokaal","Android"],
     shots:{ dir:"locatietracker", captions:["Route plannen met punten, afstand en hoogtemeters","Spoor opnemen tijdens het wandelen","Kaarttype, vervoerswijze, spoor en route","Opgeslagen routes en sporen"] } },
-  { cat:"hulp", name:"QR Lezer", repo:"qr-lezer", status:"live",
+  { cat:"hulp", name:"QR Lezer", help:"https://bruindav.github.io/qr-lezer/help.html", repo:"qr-lezer", status:"live",
     desc:"Leest QR-codes uit een foto, een screenshot of een plaatje dat je deelt vanuit WhatsApp of mail. Links, wifi-gegevens en tekst staan meteen klaar om te openen of te kopiëren. Zonder reclame, en je foto's blijven op je eigen toestel.",
     tags:["PWA","jsQR","Lokaal"],
     shots:{ dir:"qrlezer", captions:["Startscherm: foto maken of afbeelding kiezen","Rekening met QR-code ontvangen in WhatsApp","Foto delen naar de QR Lezer","Betaallink uitgelezen, klaar om te openen"] } },
@@ -312,7 +314,7 @@ function card(p){
   ].join("");
   return `<article class="card">
     <div class="card-top"><h3>${esc(p.name)}</h3>${status}</div>
-    <p>${esc(p.desc)}</p>
+    <p>${esc(p.desc)}${p.help ? ` <a class="more" href="${p.help}" target="_blank" rel="noopener">Meer…</a>` : ""}</p>
     ${p.shots ? `<button type="button" class="peek" aria-expanded="false">Toon voorbeeld <span>(${p.shots.captions.length} screenshots)</span></button>
     <div class="shots" hidden data-app="${esc(p.name)}"></div>` : ""}
     <div class="tags">${p.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
