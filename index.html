@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-22: knop Probeer de demo bij HoornaarZoeken -->
+<!-- fix-23: scheepvaart-prototypes alleen voor grotere schermen, scheepvaart als laatste groep -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -158,11 +158,11 @@ footer button:hover{color:var(--ink)}
 
   <nav class="filters" aria-label="Filter op categorie" id="filters">
     <button type="button" data-f="alle" aria-pressed="true">Alle</button>
-    <button type="button" data-f="werk" aria-pressed="false">Scheepvaart &amp; incidenten</button>
     <button type="button" data-f="vrijwillig" aria-pressed="false">Vrijwilligers &amp; vereniging</button>
     <button type="button" data-f="thuis" aria-pressed="false">Thuis &amp; financiën</button>
     <button type="button" data-f="hulp" aria-pressed="false">Handige tools</button>
     <button type="button" data-f="persoonlijk" aria-pressed="false">Persoonlijk</button>
+    <button type="button" data-f="werk" aria-pressed="false">Scheepvaart &amp; incidenten</button>
   </nav>
 
   <main id="main"></main>
@@ -196,26 +196,26 @@ footer button:hover{color:var(--ink)}
 const GH = "https://github.com/bruindav/";
 const PAGES = "https://bruindav.github.io/";
 const CATS = {
-  werk: { title: "Scheepvaart & incidenten", intro: "Prototypes voor het registreren en afhandelen van gebeurtenissen op de vaarweg, bedoeld om oplossingsrichtingen te verkennen en met gebruikers te toetsen." },
   vrijwillig: { title: "Vrijwilligers & vereniging", intro: "Apps die in de praktijk worden gebruikt door vrijwilligers en een vereniging van eigenaars." },
   thuis: { title: "Thuis & financiën", intro: "Persoonlijke apps voor agenda, tuin, financiën en administratie." },
   hulp: { title: "Handige tools", intro: "Kleine hulpmiddelen voor dagelijks gebruik." },
-  persoonlijk: { title: "Persoonlijk", intro: "Pagina's voor speciale gelegenheden en mensen die me dierbaar zijn." }
+  persoonlijk: { title: "Persoonlijk", intro: "Pagina's voor speciale gelegenheden en mensen die me dierbaar zijn." },
+  werk: { title: "Scheepvaart & incidenten", intro: "Prototypes voor het registreren en afhandelen van gebeurtenissen op de vaarweg, bedoeld om oplossingsrichtingen te verkennen en met gebruikers te toetsen. De scheepvaart-prototypes zijn gemaakt voor grotere schermen en nog niet geschikt voor mobiel." }
 };
 const P = [
   { cat:"werk", name:"Incidenten Registratie", repo:"Incident", status:"proto",
     desc:"Registratie van incidenten, stremmingen en storingen op de vaarweg, met een locatiezoeker via PDOK, kaarten van Rijkswaterstaat, protocolstappen en een dag- en nachtmodus.",
-    tags:["React","Leaflet","PDOK"] },
+    tags:["Groot scherm","React","Leaflet","PDOK"] },
   { cat:"werk", name:"Operationeel Portaal Scheepvaart", status:"proto",
     desc:"Uitgebreid prototype met modules voor Melding, Storing, Overtreding, Watermanagement, Stremming en Incident, inclusief tijdlijn, protocollen en een dienstjournaal.",
-    tags:["HTML/JS","Leaflet","OpenSeaMap"], url:"./prototypes/operationeel-portaal.html", label:"Bekijk prototype",
+    tags:["Groot scherm","HTML/JS","Leaflet","OpenSeaMap"], url:"./prototypes/operationeel-portaal.html", label:"Bekijk prototype",
     shots:{ dir:"ops", captions:["Gebeurtenissen met status, waar, wat en wie, en de tijdlijn","Nieuwe gebeurtenis kiezen"] } },
   { cat:"werk", name:"GRS Database Viewer", status:"proto",
     desc:"Analyseert Excel-exports van incidenten, storingen en stremmingen in de browser, met dashboards, filters, tijdlijn en een AVG-bewuste PDF-export.",
-    tags:["SheetJS","HTML/JS"], nolink:"Lokaal prototype, niet online" },
+    tags:["Groot scherm","SheetJS","HTML/JS"], nolink:"Lokaal prototype, niet online" },
   { cat:"werk", name:"Mobiel Verkeersleider", status:"proto",
     desc:"Demo met dienstjournaal, bemanningsbeheer en een routekaart voor de mobiele verkeersleider.",
-    tags:["HTML/JS","Leaflet"], nolink:"Lokaal prototype, niet online" },
+    tags:["Groot scherm","HTML/JS","Leaflet"], nolink:"Lokaal prototype, niet online" },
   { cat:"werk", name:"Feature Analyse", repo:"Problem-Discovery", url:"https://problem-discovery.davedebruin123-75f.workers.dev/", status:"proto",
     desc:"Interviewtool die met AI in zeven stappen een feature helder krijgt: context, probleem, doel, gebruikers, scope, AVG en open vragen. Het resultaat is een werkdocument met waardehypothese, scope, acceptatiecriteria en actiepunten. Je kiest zelf welk AI-model meedenkt. Inloggen met Google, alleen voor genodigden.",
     tags:["React","Claude API","Cloudflare Workers","Firebase"] },
