@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-23: scheepvaart-prototypes alleen voor grotere schermen, scheepvaart als laatste groep -->
+<!-- fix-24: groepen in- en uitklappen -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -117,7 +117,17 @@ h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,5vw,40px);lin
 .filters button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--bg)}
 .filters button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 section{margin-bottom:40px}
-section h2{display:flex;align-items:baseline;gap:10px;font-family:var(--display);font-weight:500;font-size:21px;margin:0 0 4px;color:var(--navy)}
+section h2{margin:0 0 4px}
+.sec-toggle{display:flex;align-items:baseline;gap:10px;width:100%;background:none;border:0;padding:6px 0;text-align:left;cursor:pointer;font-family:var(--display);font-weight:500;font-size:21px;color:var(--navy)}
+.sec-toggle::before{content:"▸";font-size:15px;color:var(--accent);transition:transform .15s;display:inline-block;width:14px}
+.sec-toggle[aria-expanded="true"]::before{transform:rotate(90deg)}
+.sec-toggle .names{font-family:var(--body);font-size:13px;color:var(--muted);font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.sec-toggle[aria-expanded="true"] .names{display:none}
+.sec-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+section.closed{margin-bottom:8px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.fold-all{display:flex;gap:14px;margin:-18px 0 18px;font-size:13px}
+.fold-all button{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline dotted;cursor:pointer;font:inherit}
+.fold-all button:hover{color:var(--ink)}
 section h2 .count{font-family:var(--mono);font-size:12px;color:var(--muted)}
 section > p{margin:0 0 16px;color:var(--muted);font-size:14px;max-width:70ch}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
@@ -165,6 +175,7 @@ footer button:hover{color:var(--ink)}
     <button type="button" data-f="werk" aria-pressed="false">Scheepvaart &amp; incidenten</button>
   </nav>
 
+  <div class="fold-all" id="fold-all"><button type="button" data-fold="open">Alles openklappen</button><button type="button" data-fold="dicht">Alles dichtklappen</button></div>
   <main id="main"></main>
 
   <dialog class="viewer" id="viewer" aria-label="Screenshots">
@@ -189,7 +200,7 @@ footer button:hover{color:var(--ink)}
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-  <footer><span>Alle apps draaien in de browser. Voor sommige apps moet je eerst inloggen.</span><span id="admin-bar"><button type="button" id="admin-btn">Beheer</button></span></footer>
+  <footer><span>Alle apps draaien in de browser. Voor sommige apps moet je eerst inloggen.</span><span id="admin-bar"><button type="button" id="admin-btn">Inloggen</button></span></footer>
 </div>
 
 <script>
@@ -328,13 +339,33 @@ function card(p){
     <div class="actions">${actions}<button type="button" class="rev-btn" data-app="${esc(p.name)}">${revLabel(p)}</button></div>
   </article>`;
 }
+// Groepen in- en uitklappen; welke open staan wordt in deze browser onthouden (standaard alles dicht)
+let OPEN = new Set();
+try { OPEN = new Set(JSON.parse(localStorage.getItem("open-groepen") || "[]")); } catch(_) {}
+const saveOpen = () => { try { localStorage.setItem("open-groepen", JSON.stringify([...OPEN])) } catch(_) {} };
+let curFilter = "alle";
 function render(f){
-  const main = document.getElementById("main");
+  curFilter = f;
+  const main = document.getElementById("main"), single = f !== "alle";
+  document.getElementById("fold-all").hidden = single;
   main.innerHTML = Object.keys(CATS).filter(k => f==="alle" || f===k).map(k => {
-    const items = P.filter(p => p.cat===k);
-    return `<section aria-labelledby="h-${k}"><h2 id="h-${k}">${esc(CATS[k].title)}<span class="count">${items.length}</span></h2><p>${esc(CATS[k].intro)}</p><div class="grid">${items.map(card).join("")}</div></section>`;
+    const items = P.filter(p => p.cat===k), open = single || OPEN.has(k);
+    return `<section aria-labelledby="h-${k}" class="${open ? "" : "closed"}"><h2 id="h-${k}"><button type="button" class="sec-toggle" data-k="${k}" aria-expanded="${open}" aria-controls="body-${k}">${esc(CATS[k].title)}<span class="count">${items.length}</span><span class="names">${esc(items.map(p => p.name).join(" · "))}</span></button></h2><div id="body-${k}" ${open ? "" : "hidden"}><p>${esc(CATS[k].intro)}</p><div class="grid">${items.map(card).join("")}</div></div></section>`;
   }).join("");
+  if (window.refreshReviews) window.refreshReviews();
 }
+document.getElementById("main").addEventListener("click", e => {
+  const t = e.target.closest(".sec-toggle"); if (!t) return;
+  const k = t.dataset.k, open = t.getAttribute("aria-expanded") !== "true";
+  t.setAttribute("aria-expanded", open);
+  document.getElementById("body-" + k).hidden = !open;
+  t.closest("section").classList.toggle("closed", !open);
+  if (curFilter === "alle") { open ? OPEN.add(k) : OPEN.delete(k); saveOpen(); }
+});
+document.getElementById("fold-all").addEventListener("click", e => {
+  const b = e.target.closest("[data-fold]"); if (!b) return;
+  OPEN = b.dataset.fold === "open" ? new Set(Object.keys(CATS)) : new Set(); saveOpen(); render(curFilter);
+});
 document.getElementById("filters").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b) return;
   document.querySelectorAll("#filters button").forEach(x => x.setAttribute("aria-pressed", x===b ? "true":"false"));
