@@ -1,0 +1,3425 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operationeel Portaal Scheepvaart - Gebeurtenissen - Corridor 3</title>
+<style>
+  :root{
+    --bg:#08080a;
+    --panel:#1c1b22;
+    --panel-alt:#232229;
+    --panel-hover:#26252d;
+    --info-block-body:#333846;
+    --info-block-head:#1b1e26;
+    --info-blue:#6f93f0;
+    --border:#302f38;
+    --border-soft:#26252d;
+    --accent:#e8b73d;
+    --accent-bright:#f5d76e;
+    --text:#f2f2f3;
+    --text-dim:#a7a6ad;
+    --text-dimmer:#7c7b82;
+    --badge-bg:#3a3942;
+    --red:#d64545;
+    --amber-icon:#c98a1f;
+    --status-behandeling:#e8b73d;
+    --status-aangemeld:#9a99a1;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI",Arial,Helvetica,sans-serif;
+    font-size:14px;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+    overflow:hidden;
+  }
+
+  /* ===== HEADER ===== */
+  .topbar{
+    height:44px;
+    min-height:44px;
+    background:var(--bg);
+    display:flex;
+    align-items:center;
+    padding:0 16px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .topbar .hamburger{
+    width:20px;height:16px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    margin-right:16px;cursor:pointer;
+  }
+  .topbar .hamburger span{display:block;height:2px;background:var(--text-dim);}
+  .topbar .title{
+    font-size:15px;
+    color:var(--text);
+    font-weight:400;
+    letter-spacing:.2px;
+  }
+  .topbar .spacer{flex:1;}
+  .topbar .right{
+    display:flex;align-items:center;gap:18px;
+    color:var(--text-dim);
+    font-size:13px;
+  }
+  .topbar .avatar{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--panel-alt);
+    border:1px solid var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:600;color:var(--accent);
+  }
+  .topbar .bell{width:16px;height:16px;color:var(--text-dim);}
+
+  /* ===== SUBTAB (Corridor 3) ===== */
+  .subtabbar{
+    height:30px;min-height:30px;
+    background:var(--bg);
+    display:flex;align-items:flex-end;
+    padding:0 16px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .subtab{
+    color:var(--accent);
+    font-size:13px;
+    padding:6px 4px 8px 4px;
+    border-bottom:2px solid var(--accent);
+    cursor:default;
+  }
+
+  /* ===== MAIN LAYOUT ===== */
+  .main{
+    flex:1;
+    display:flex;
+    overflow-x:auto;
+    overflow-y:hidden;
+  }
+
+  /* ---- LEFT PANEL ---- */
+  .left-panel-wrap{
+    display:flex;
+    flex-shrink:0;
+    border-right:1px solid var(--border-soft);
+    overflow:hidden;
+    transition:width .18s ease;
+    width:494px;
+  }
+  .left-panel-wrap.collapsed{
+    width:24px;
+  }
+  .collapse-rail{
+    width:24px;
+    min-width:24px;
+    background:var(--bg);
+    border-right:1px solid var(--border-soft);
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding-top:14px;
+    cursor:pointer;
+  }
+  .collapse-rail:hover{background:var(--panel-hover);}
+  .collapse-rail .caret{
+    width:16px;height:16px;
+    color:var(--text-dim);
+    transition:transform .18s;
+  }
+  .left-panel-wrap.collapsed .collapse-rail .caret{
+    transform:rotate(180deg);
+  }
+  .collapse-rail:hover .caret{color:var(--accent);}
+  .left-panel{
+    width:470px;
+    min-width:470px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .left-panel-wrap.collapsed .left-panel{
+    display:none;
+  }
+  .list-tabs{
+    display:flex;align-items:center;
+    padding:10px 12px;
+    gap:18px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .list-tab{
+    font-size:13px;color:var(--text-dim);
+    cursor:pointer;
+    padding-bottom:2px;
+  }
+  .list-tab.active{
+    color:var(--text);
+    border-bottom:2px solid var(--accent);
+    font-weight:600;
+  }
+  .list-tabs .grow{flex:1;}
+  .btn-nieuw{
+    background:transparent;
+    border:1px solid var(--accent);
+    color:var(--accent);
+    font-size:12px;
+    padding:5px 10px;
+    border-radius:2px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-nieuw:hover{background:rgba(232,183,61,.08);}
+  .icon-btn{
+    width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text-dim);
+    cursor:pointer;
+    border-radius:3px;
+  }
+  .icon-btn:hover{background:var(--panel-hover);}
+  .toggle{
+    width:34px;height:18px;
+    border-radius:9px;
+    background:var(--accent);
+    position:relative;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .toggle .knob{
+    position:absolute;top:2px;right:2px;
+    width:14px;height:14px;border-radius:50%;
+    background:#1a1a1a;
+    transition:right .15s;
+  }
+  .toggle.off{background:#3a3942;}
+  .toggle.off .knob{right:18px;background:#8a8990;}
+
+  .event-list{
+    flex:1;
+    overflow-y:auto;
+  }
+  .event-item{
+    padding:10px 12px 12px 12px;
+    border-bottom:1px solid var(--border-soft);
+    cursor:pointer;
+    position:relative;
+  }
+  .event-item:hover{background:var(--panel-hover);}
+  .event-item.selected{
+    background:var(--panel-alt);
+    box-shadow:inset 3px 0 0 var(--accent);
+  }
+  .event-id{
+    font-size:10px;color:var(--text-dimmer);
+    margin-bottom:3px;
+    padding-left:26px;
+  }
+  .event-row{
+    display:flex;align-items:flex-start;gap:8px;
+  }
+  .event-icon{
+    width:18px;height:18px;flex-shrink:0;margin-top:2px;
+  }
+  .event-body{flex:1;min-width:0;}
+  .event-title-row{
+    display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  }
+  .event-title{
+    font-size:13.5px;font-weight:600;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .event-status{
+    font-size:11.5px;white-space:nowrap;flex-shrink:0;
+  }
+  .event-status.behandeling{color:var(--status-behandeling);}
+  .event-status.aangemeld{color:var(--status-aangemeld);}
+  .event-status.beeindigd{color:var(--text-dimmer);}
+  .event-desc-row{
+    display:flex;justify-content:space-between;align-items:flex-end;gap:8px;margin-top:2px;
+  }
+  .event-desc{
+    font-size:12px;color:var(--text-dim);
+    line-height:1.4;
+  }
+  .event-badge{
+    font-size:11.5px;color:var(--text-dim);white-space:nowrap;flex-shrink:0;
+  }
+
+  .empty-tab-msg{
+    padding:40px 20px;text-align:center;color:var(--text-dimmer);font-size:13px;
+  }
+
+  /* ---- RIGHT PANEL ---- */
+  .right-panel{
+    flex:1;
+    min-width:560px;
+    overflow-y:auto;
+    padding:20px 24px 40px 24px;
+  }
+  .placeholder-panel{
+    height:100%;
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:8px;
+    color:var(--text-dimmer);
+  }
+  .placeholder-panel svg{opacity:.35;margin-bottom:6px;}
+  .placeholder-panel .msg{font-size:15px;color:var(--text-dim);}
+  .placeholder-panel .sub{font-size:12.5px;}
+
+  .incident-header{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:16px;
+  }
+  .incident-header h1{
+    font-size:17px;font-weight:600;margin:0 0 4px 0;color:var(--text);
+  }
+  .incident-header .op-datum{
+    font-size:12.5px;color:var(--text-dim);
+  }
+  .incident-header .dossier{
+    font-size:12.5px;color:var(--text-dim);white-space:nowrap;padding-top:2px;
+  }
+  .dossier-toggle{
+    display:flex;align-items:center;gap:7px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .dossier-toggle:hover{color:var(--accent);}
+  .dossier-toggle .chev{
+    width:14px;height:14px;color:var(--text-dim);
+    transition:transform .15s;
+    flex-shrink:0;
+  }
+  .dossier-toggle:hover .chev{color:var(--accent);}
+  .dossier-toggle.open .chev{transform:rotate(180deg);}
+
+  .info-toggle-bar{
+    display:flex;align-items:center;gap:8px;
+    padding:7px 10px;
+    background:var(--panel-alt);
+    border:1px solid var(--border-soft);
+    cursor:pointer;
+    margin-bottom:2px;
+    user-select:none;
+  }
+  .info-toggle-bar:hover{background:var(--panel-hover);}
+  .info-toggle-bar .lab{
+    font-size:12.5px;color:var(--text-dim);font-weight:600;
+    letter-spacing:.3px;
+  }
+  .info-toggle-bar .chev{
+    width:14px;height:14px;color:var(--text-dim);
+    transition:transform .15s;
+  }
+  .info-toggle-bar.open .chev{transform:rotate(180deg);}
+  .info-cards-wrap{
+    margin-bottom:14px;
+  }
+  .info-cards-wrap.collapsed .info-cards{
+    display:none;
+  }
+  .info-cards{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:2px;
+  }
+  .info-card{
+    background:var(--info-block-body);
+    display:flex;flex-direction:column;
+  }
+  .info-card .head{
+    background:var(--info-block-head);
+    padding:8px 12px;
+    font-size:13px;font-weight:600;color:var(--info-blue);
+    border-bottom:1px solid var(--border-soft);
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+  }
+  .protocol-open-btn{
+    width:15px;height:15px;color:var(--accent);
+    cursor:pointer;flex-shrink:0;
+  }
+  .protocol-open-btn:hover{color:var(--accent-bright);}
+  .info-card .body{
+    padding:10px 12px;
+    flex:1;
+    font-size:12.5px;
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .info-field{display:flex;justify-content:space-between;gap:6px;color:var(--text);}
+  .info-field .lab{color:var(--text-dim);}
+  .info-field .lab:before{content:"• ";color:var(--text-dim);}
+  .info-field .val{font-weight:600;text-align:right;}
+  .info-plain{color:var(--text);font-weight:500;}
+  .info-empty{color:var(--text-dimmer);}
+
+  /* ---- Waar: locatie, nadere aanduiding, MVL-inzet, coördinaten-tooltip ---- */
+  .waar-name{
+    color:var(--info-blue);text-decoration:underline;
+    font-weight:600;font-size:13px;cursor:pointer;
+  }
+  .waar-name:hover{color:#8fabf5;}
+  .waar-sub{color:var(--text-dim);font-size:12px;margin-top:1px;}
+
+  .info-icon-wrap{position:relative;display:inline-flex;cursor:help;}
+  .info-icon-wrap .info-ic{width:14px;height:14px;color:var(--info-blue);}
+  .coord-tooltip{
+    position:absolute;top:20px;right:0;
+    background:#14161c;
+    border:1px solid var(--border);
+    padding:10px 14px;
+    min-width:230px;
+    font-size:12px;
+    opacity:0;visibility:hidden;
+    transition:opacity .12s;
+    z-index:80;
+    box-shadow:0 10px 26px rgba(0,0,0,.55);
+  }
+  .info-icon-wrap:hover .coord-tooltip{opacity:1;visibility:visible;}
+  .coord-row{
+    display:flex;justify-content:space-between;gap:16px;
+    padding:3px 0;color:var(--text-dim);white-space:nowrap;
+  }
+  .coord-row .v{color:var(--text);font-weight:700;}
+
+  /* ---- chips: betrokkenen / hulpverleners / MVL-inzet ---- */
+  .chip-group-label{
+    font-size:10.5px;color:var(--text-dimmer);
+    letter-spacing:.4px;margin:10px 0 6px 0;
+    text-transform:uppercase;
+  }
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    display:inline-flex;align-items:center;gap:5px;
+    border:1px solid rgba(111,147,240,.45);
+    color:var(--info-blue);font-size:12px;font-weight:600;
+    padding:4px 10px;border-radius:12px;
+    background:rgba(111,147,240,.07);
+    white-space:nowrap;
+  }
+  .chip .dot{width:7px;height:7px;border-radius:50%;background:#e2574c;flex-shrink:0;}
+  .chip svg{width:13px;height:13px;flex-shrink:0;}
+
+  .info-cards.cols-3{grid-template-columns:repeat(3, 1fr);}
+
+  /* ---- Edit mode (bv. Overtreding/Watermanagement kaartje) ---- */
+  .edit-form{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    margin-bottom:10px;
+    align-items:stretch;
+  }
+  .toelichting-col{display:flex;flex-direction:column;height:100%;}
+  .toelichting-col .edit-field{flex:1;display:flex;flex-direction:column;margin-bottom:0;}
+  .toelichting-col .edit-textarea{flex:1;}
+  .edit-field{margin-bottom:9px;}
+  .edit-field .flabel{font-size:11px;color:var(--text-dimmer);margin-bottom:3px;}
+  .edit-field .fval-static{font-size:13px;color:var(--text);}
+  .edit-input, .edit-textarea{
+    width:100%;
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    font-size:13px;
+    padding:5px 8px;
+    font-family:inherit;
+  }
+  .edit-input:focus, .edit-textarea:focus{outline:1px solid var(--accent);border-color:var(--accent);}
+  .edit-textarea{min-height:84px;resize:vertical;}
+  .edit-input-icon-wrap{position:relative;}
+  .edit-input-icon-wrap input{padding-right:30px;}
+  .edit-input-icon-wrap svg{
+    position:absolute;right:8px;top:25px;
+    width:14px;height:14px;color:var(--text-dim);
+    pointer-events:none;
+  }
+  .edit-radio-group{display:flex;gap:20px;margin-bottom:9px;}
+  .edit-radio{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer;}
+  .edit-radio input{accent-color:var(--accent);}
+  .edit-checkbox-group{display:flex;gap:20px;margin-top:1px;}
+  .edit-checkbox{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-dim);cursor:pointer;}
+  .edit-checkbox input{accent-color:var(--accent);}
+  .read-checkbox-row{display:flex;gap:22px;margin-top:6px;font-size:12.5px;color:var(--text-dim);}
+  .read-checkbox-row .on{color:var(--text);}
+  .edit-footer{
+    display:flex;justify-content:flex-end;gap:10px;
+    margin-top:2px;padding-top:8px;
+    border-top:1px solid var(--border-soft);
+  }
+  .edit-btn{
+    display:flex;align-items:center;gap:6px;
+    padding:6px 13px;font-size:12.5px;font-weight:700;
+    border:1px solid var(--border);color:var(--text-dim);
+    cursor:pointer;background:transparent;
+  }
+  .edit-btn svg{width:13px;height:13px;}
+  .edit-btn:hover{border-color:var(--text-dim);color:var(--text);}
+  .edit-btn.primary{border-color:var(--accent);color:var(--accent);}
+  .edit-btn.primary:hover{background:rgba(232,183,61,.08);color:var(--accent-bright);border-color:var(--accent-bright);}
+
+  /* ---- Locatie: doorzoekbaar veld met gecategoriseerde dropdown ---- */
+  .loc-field-wrap{position:relative;}
+  .loc-input-wrap{position:relative;}
+  .loc-input-wrap input{padding-right:30px;}
+  .loc-search-icon{
+    position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    width:14px;height:14px;color:var(--text-dim);
+    pointer-events:none;
+  }
+  .loc-clear-icon{
+    position:absolute;right:6px;top:50%;transform:translateY(-50%);
+    width:17px;height:17px;color:var(--accent);
+    cursor:pointer;
+    display:none;
+  }
+  .loc-clear-icon:hover{color:var(--accent-bright);}
+  .loc-input-wrap.has-value .loc-search-icon{display:none;}
+  .loc-input-wrap.has-value .loc-clear-icon{display:block;}
+  .loc-field-label-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px;}
+  .loc-map-btn{
+    display:flex;align-items:center;gap:4px;
+    color:var(--accent);font-size:11px;font-weight:600;
+    cursor:pointer;white-space:nowrap;
+  }
+  .loc-map-btn:hover{color:var(--accent-bright);}
+  .loc-map-btn svg{width:12px;height:12px;}
+  .loc-dropdown{
+    position:absolute;top:100%;left:0;right:0;margin-top:4px;
+    background:#1c1e26;border:1px solid var(--border);
+    max-height:280px;overflow-y:auto;
+    z-index:120;
+    box-shadow:0 14px 30px rgba(0,0,0,.55);
+    display:none;
+  }
+  .loc-dropdown.open{display:block;}
+  .loc-group-label{padding:7px 12px 3px 12px;font-size:11px;color:var(--text-dimmer);}
+  .loc-item{padding:6px 12px;font-size:13px;color:var(--text);cursor:pointer;}
+  .loc-item.indent{padding-left:30px;}
+  .loc-item:hover{background:var(--panel-hover);color:var(--accent);}
+  .loc-empty{padding:10px 12px;font-size:12.5px;color:var(--text-dimmer);}
+
+  /* ---- Naam vaartuig: doorzoekbare vaartuiglijst (bij Beroepsvaart) ---- */
+  .vessel-dropdown{min-width:100%;width:max-content;max-width:none;}
+  .vessel-item{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 12px;
+    cursor:pointer;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .vessel-item:last-child{border-bottom:none;}
+  .vessel-item:hover{background:var(--panel-hover);}
+  .vessel-item .v-icon{width:20px;height:20px;flex-shrink:0;}
+  .vessel-item .v-main{min-width:190px;}
+  .vessel-item .v-name{font-weight:700;font-size:12.5px;color:var(--text);}
+  .vessel-item .v-type{font-size:11px;color:var(--info-blue);margin-top:1px;}
+  .vessel-item .v-stats{
+    display:grid;grid-template-columns:auto auto;
+    gap:2px 26px;font-size:11px;color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .vessel-item .v-stats b{color:var(--text);font-weight:600;}
+
+  /* ===== POPUP: Kaart (nadere locatie kiezen op vaarweg) ===== */
+  .map-modal-panel{
+    padding:0;
+    width:760px;max-width:95vw;
+  }
+  .map-header{
+    background:#000;
+    color:var(--text);
+    font-size:14px;
+    padding:12px 20px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .map-canvas-wrap{
+    position:relative;
+    height:400px;
+    overflow:hidden;
+    background:#bfe0ef;
+    cursor:crosshair;
+  }
+  .map-canvas{
+    position:absolute;inset:0;
+    transform-origin:center center;
+    transition:transform .15s ease;
+  }
+  .map-canvas svg{width:100%;height:100%;display:block;}
+  .map-zoom-controls{
+    position:absolute;top:12px;left:12px;z-index:5;
+    display:flex;flex-direction:column;
+  }
+  .map-zoom-btn{
+    width:26px;height:24px;
+    background:#fff;color:#222;
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:700;
+    cursor:pointer;
+    border:1px solid #b8b8b8;
+  }
+  .map-zoom-btn:first-child{border-radius:2px 2px 0 0;}
+  .map-zoom-btn:last-child{border-radius:0 0 2px 2px;border-top:none;}
+  .map-zoom-btn:hover{background:#f0f0f0;}
+  .map-pin{
+    position:absolute;
+    width:26px;height:26px;
+    transform:translate(-50%,-92%);
+    pointer-events:none;
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));
+    z-index:6;
+  }
+  .map-pin svg{width:100%;height:100%;}
+  .map-spec-row{
+    padding:12px 20px;
+    background:var(--bg);
+    border-top:1px solid var(--border-soft);
+  }
+  .map-spec-row .flabel{font-size:11px;color:var(--text-dimmer);margin-bottom:4px;}
+  .map-spec-row .loc-input-wrap input{
+    width:100%;
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    font-size:13px;
+    padding:7px 30px 7px 9px;
+    font-family:inherit;
+  }
+  .map-spec-row .loc-input-wrap input:focus{outline:1px solid var(--accent);border-color:var(--accent);}
+  .map-footer{
+    display:flex;justify-content:flex-end;gap:24px;
+    padding:12px 20px;
+    background:var(--bg);
+    border-top:1px solid var(--border-soft);
+  }
+  .map-footer .action-link{font-size:13px;font-weight:700;}
+
+  .action-row{
+    display:flex;justify-content:flex-end;align-items:center;gap:22px;
+    margin-bottom:18px;
+    font-size:13px;
+  }
+  .action-link{
+    color:var(--accent);
+    cursor:pointer;
+    display:flex;align-items:center;gap:5px;
+    white-space:nowrap;
+  }
+  .action-link:hover{color:var(--accent-bright);}
+
+  .vervolg-wrap{position:relative;}
+  .vervolg-menu{
+    position:absolute;top:100%;right:0;margin-top:8px;
+    background:var(--panel-alt);
+    border:1px solid var(--border);
+    min-width:250px;
+    max-height:75vh;
+    overflow-y:auto;
+    box-shadow:0 12px 30px rgba(0,0,0,.55);
+    z-index:60;
+    padding:6px 0;
+    display:none;
+  }
+  .vervolg-menu.open{display:block;}
+  .vervolg-section-label{
+    padding:10px 16px 6px 16px;
+    font-size:11px;color:var(--text-dimmer);
+    letter-spacing:.3px;
+  }
+  .vervolg-divider{border-top:1px solid var(--border-soft);margin:4px 0;}
+  .vervolg-empty{padding:14px 16px;font-size:12.5px;color:var(--text-dimmer);}
+  .vervolg-item{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:7px 16px;
+    font-size:13px;color:var(--text);
+    cursor:pointer;
+    gap:10px;
+  }
+  .vervolg-item:hover{background:var(--panel-hover);}
+  .vervolg-item .dot{
+    width:14px;height:14px;border-radius:50%;flex-shrink:0;
+    background:radial-gradient(circle at 35% 35%, #4fb6ea, #2f7fc4 45%, #d9622f 100%);
+  }
+  .vervolg-item .pencil{
+    width:12px;height:12px;color:var(--accent);
+    opacity:.55;flex-shrink:0;margin-left:auto;
+  }
+  .vervolg-item:hover .pencil{opacity:1;}
+
+  /* ===== POPUP: protocol/status stap details ===== */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.6);
+    display:flex;align-items:center;justify-content:center;
+    z-index:200;
+  }
+  .modal-panel{
+    background:var(--panel-alt);
+    border:1px solid var(--border);
+    width:620px;max-width:92vw;
+    max-height:82vh;overflow-y:auto;
+    padding:20px 24px;
+    position:relative;
+    box-shadow:0 20px 50px rgba(0,0,0,.6);
+  }
+  .modal-close{
+    position:absolute;top:12px;right:14px;
+    width:18px;height:18px;color:var(--text-dim);
+    cursor:pointer;
+  }
+  .modal-close:hover{color:var(--accent);}
+  .modal-title{
+    font-size:14px;font-weight:600;margin:0 0 3px 0;color:var(--text);
+    padding-right:24px;
+  }
+  .modal-sub{
+    font-size:12px;color:var(--text-dim);margin-bottom:16px;
+  }
+
+  /* ===== POPUP: protocol - volledig overzicht ===== */
+  .protocol-modal-panel{
+    padding:0;
+    width:460px;
+  }
+  .protocol-modal-header{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 18px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .protocol-modal-title{
+    color:#8b9df0;font-size:14px;font-weight:600;
+  }
+  .modal-close-x{
+    width:16px;height:16px;color:var(--text-dim);
+    cursor:pointer;flex-shrink:0;
+  }
+  .modal-close-x:hover{color:var(--accent);}
+  .protocol-rows{
+    max-height:70vh;overflow-y:auto;
+  }
+  .protocol-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:11px 18px;
+    border-bottom:1px solid var(--border-soft);
+    cursor:pointer;
+  }
+  .protocol-row:last-child{border-bottom:none;}
+  .protocol-row:hover{background:var(--panel-hover);}
+  .protocol-row .lab{color:#8b9df0;font-size:13px;}
+  .protocol-row .val{font-size:12px;color:var(--text-dim);}
+  .protocol-row .val.todo{
+    color:#e2574c;font-weight:700;font-size:11.5px;letter-spacing:.4px;
+  }
+
+  /* ===== POPUP: Nieuwe gebeurtenis ===== */
+  .new-event-modal-panel{
+    padding:0;
+    width:600px;max-width:94vw;
+    background:var(--bg);
+  }
+  .new-event-header{
+    background:var(--bg);
+    padding:14px 22px;
+    font-size:13px;color:var(--text);
+    border-bottom:1px solid var(--border-soft);
+  }
+  .new-event-columns{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:32px;
+    padding:22px 22px 4px 22px;
+  }
+  .new-event-col-title{
+    font-size:19px;font-weight:700;color:var(--text);
+    margin:0 0 12px 0;
+  }
+  .new-event-item{
+    display:flex;align-items:center;gap:12px;
+    background:var(--panel-alt);
+    border:1px solid var(--border);
+    padding:11px 14px;
+    margin-bottom:6px;
+    cursor:pointer;
+  }
+  .new-event-item:hover{background:var(--panel-hover);border-color:var(--accent);}
+  .new-event-item .ic{width:19px;height:19px;flex-shrink:0;color:var(--accent);}
+  .new-event-item .lbl{flex:1;font-size:13.5px;font-weight:700;color:var(--text);}
+  .new-event-item .chev{width:14px;height:14px;color:var(--accent);flex-shrink:0;}
+  .new-event-divider{
+    border-top:1px solid var(--border-soft);
+    margin:8px 0 9px 0;
+  }
+  .new-event-footer{
+    display:flex;justify-content:flex-end;align-items:center;
+    padding:14px 22px 20px 22px;
+  }
+  .new-event-cancel{
+    display:flex;align-items:center;gap:7px;
+    color:var(--accent);font-weight:700;font-size:13px;
+    letter-spacing:.3px;
+    cursor:pointer;
+  }
+  .new-event-cancel:hover{color:var(--accent-bright);}
+  .new-event-cancel svg{width:16px;height:16px;}
+
+  /* timeline */
+  .timeline{}
+  .date-row{
+    color:var(--text-dim);
+    font-size:12.5px;
+    padding:7px 4px;
+    border-bottom:1px solid var(--border-soft);
+    margin-top:6px;
+  }
+  .date-row:first-child{margin-top:0;}
+
+  .step-card{
+    border-bottom:1px solid var(--border-soft);
+  }
+  .step-head{
+    display:flex;align-items:center;gap:14px;
+    padding:11px 8px;
+    cursor:pointer;
+  }
+  .step-head:hover{background:var(--panel-hover);}
+  .step-time{
+    width:44px;flex-shrink:0;
+    font-size:13px;font-weight:600;color:var(--text);
+  }
+  .step-num{
+    width:20px;height:20px;border-radius:50%;
+    background:var(--panel-alt);
+    border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;color:var(--text-dim);
+    flex-shrink:0;
+  }
+  .step-name{
+    width:230px;flex-shrink:0;
+    font-size:13px;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .step-detail{
+    flex:1;
+    font-size:13px;color:var(--text-dim);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .step-right{
+    display:flex;align-items:center;gap:6px;flex-shrink:0;
+  }
+  .role-badge{
+    background:var(--badge-bg);
+    color:var(--text);
+    font-size:10.5px;font-weight:600;
+    padding:3px 7px;
+    border-radius:10px;
+    letter-spacing:.3px;
+  }
+  .chevron{
+    width:14px;height:14px;color:var(--text-dim);
+    transition:transform .15s;
+  }
+  .step-card.open .chevron{transform:rotate(180deg);}
+  .step-card.open .step-head{background:var(--panel-hover);}
+
+  .step-body{
+    display:none;
+    background:var(--panel-alt);
+    padding:14px 18px 15px 18px;
+  }
+  .step-card.open .step-body{display:block;}
+
+  .form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    margin-bottom:16px;
+  }
+  .form-fields-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr 2fr;
+    gap:24px;
+    margin-bottom:16px;
+  }
+  .form-fields-col{display:flex;flex-direction:column;}
+  .form-fields-col .form-row-inline{gap:16px;}
+  .form-field{margin-bottom:14px;}
+  .form-field .flabel{
+    font-size:11px;color:var(--text-dimmer);margin-bottom:3px;
+  }
+  .form-field .fval{
+    font-size:13px;color:var(--text);
+    padding-bottom:4px;
+    border-bottom:1px solid var(--border);
+  }
+  .form-field .fval.empty{color:var(--text-dimmer);}
+  .form-row-inline{display:flex;gap:24px;}
+  .form-row-inline .form-field{flex:1;}
+  .form-row-inline .edit-field{flex:1;margin-bottom:9px;}
+  .form-row-inline .edit-field.grow{flex:1.6;}
+  .form-section-title{
+    font-size:12.5px;color:var(--text-dim);margin:4px 0 10px 0;
+  }
+  .fval-with-icon{
+    display:flex;justify-content:space-between;align-items:center;
+  }
+
+  .step-footer{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:6px;
+    padding-top:10px;
+    border-top:1px solid var(--border-soft);
+  }
+  .footer-tabs{display:flex;gap:18px;}
+  .footer-tab{
+    font-size:12.5px;color:var(--text-dim);
+    padding-bottom:6px;
+  }
+  .footer-tab.active{
+    color:var(--accent);
+    border-bottom:2px solid var(--accent);
+  }
+  .footer-actions{
+    display:flex;gap:18px;align-items:center;
+    font-size:12.5px;color:var(--text-dim);
+  }
+  .footer-actions .lab{color:var(--text-dim);}
+  .footer-actions a{color:var(--accent);text-decoration:none;cursor:pointer;}
+  .footer-actions a:hover{color:var(--accent-bright);}
+
+  .generic-detail{
+    font-size:13px;color:var(--text-dim);
+  }
+  .generic-detail .row{display:flex;gap:8px;margin-bottom:8px;}
+  .generic-detail .k{color:var(--text-dimmer);min-width:110px;}
+  .generic-detail .v{color:var(--text);}
+
+  /* ===== BOTTOM NAV ===== */
+  .bottomnav{
+    height:56px;min-height:56px;
+    background:var(--bg);
+    border-top:1px solid var(--border-soft);
+    display:flex;align-items:center;
+    padding:0 16px;
+  }
+  .navitems{
+    flex:1;
+    display:flex;
+    gap:34px;
+  }
+  .navitem{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:var(--text-dim);
+    font-size:11px;
+    cursor:pointer;
+  }
+  .navitem svg{width:20px;height:20px;}
+  .navitem.active{color:var(--accent);}
+  .navitem:hover{color:var(--text);}
+  .navitem.active:hover{color:var(--accent-bright);}
+  .nav-datetime{
+    color:var(--text-dim);
+    font-size:13px;
+    white-space:nowrap;
+  }
+
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:#333238;border-radius:5px;}
+  ::-webkit-scrollbar-thumb:hover{background:#403f47;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="topbar">
+    <div class="hamburger"><span></span><span></span><span></span></div>
+    <div class="title">Operationeel Portaal Scheepvaart - Gebeurtenissen - Corridor 3</div>
+    <div class="spacer"></div>
+    <div class="right">
+      <span>Registratieverantwoordelijke</span>
+      <span>Test</span>
+      <div class="avatar">DB</div>
+      <svg class="bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+    </div>
+  </div>
+
+  <div class="subtabbar">
+    <div class="subtab">Corridor 3</div>
+  </div>
+
+  <div class="main">
+
+    <!-- LEFT PANEL: gebeurtenislijst MF -->
+    <div class="left-panel-wrap" id="leftPanelWrap">
+      <div class="collapse-rail" id="collapseRail" title="Lijst in-/uitklappen">
+        <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 5 8 12 15 19"/></svg>
+      </div>
+      <div class="left-panel">
+        <div class="list-tabs">
+          <div class="list-tab active" data-tab="actueel">Actueel 81 / 81</div>
+          <div class="list-tab" data-tab="planning">Planning 14 / 14</div>
+          <div class="list-tab" data-tab="historie">Historie 143 / 143</div>
+          <div class="grow"></div>
+          <button class="btn-nieuw" id="btnNieuw">+ NIEUW</button>
+          <div class="icon-btn" title="Filter">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16l-6 8v6l-4 2v-8L4 4z"/></svg>
+          </div>
+          <div class="toggle" id="toggleSwitch"><div class="knob"></div></div>
+        </div>
+        <div class="event-list" id="eventList"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: gebeurtenis MF (dynamisch) -->
+    <div class="right-panel" id="rightPanel"></div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottomnav">
+    <div class="navitems">
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/></svg>
+        Dashboard
+      </div>
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Werkgebieden
+      </div>
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>
+        Corridor
+      </div>
+      <div class="navitem active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
+        Gebeurtenissen
+      </div>
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        Planbord
+      </div>
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 18l6-13 6 13"/><path d="M13 18l4-10 4 10"/><path d="M2 21h20"/></svg>
+        Kaart
+      </div>
+      <div class="navitem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="5" r="2"/><path d="M12 7v7"/><path d="M6 12s2 3 6 3 6-3 6-3"/><path d="M4 21h16"/><path d="M6 21l2-6M18 21l-2-6"/></svg>
+        Wachthaven
+      </div>
+    </div>
+    <div class="nav-datetime" id="navDateTime"></div>
+  </div>
+
+</div>
+
+<script>
+/* ============ ICONS ============ */
+const ICONS = {
+  incident: `<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="5" fill="#f5d445"/><g stroke="#f5d445" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/><line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/></g></svg>`,
+  beperking: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b3720a" stroke-width="1.8"><path d="M12 3v18"/><path d="M5 8l-3 6a4 4 0 007 0l-3-6"/><path d="M19 8l-3 6a4 4 0 007 0l-3-6"/><path d="M4 8h16"/><path d="M9 21h6"/></svg>`,
+  stremming: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#c21f16" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="6" y1="18" x2="18" y2="6"/></svg>`,
+  beheersmaatregel: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#eecf4a" stroke-width="1.7"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.9" fill="#eecf4a" stroke="none"/></svg>`,
+  overtreding: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#eecf4a" stroke-width="1.8"><path d="M12 2 L23 21 L1 21 Z" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="14.5" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1" fill="#eecf4a" stroke="none"/></svg>`,
+  watermanagement: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#eecf4a" stroke-width="1.8"><path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/></svg>`,
+  melding: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#eecf4a" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="1.5"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg>`
+};
+
+/* ============ DATA ============ */
+
+// Gedeelde protocol-stappen (Waar/Wie/Wat) van het hoofdincident.
+// Deze objecten worden zowel in de tijdlijn als in de Status-kaart gebruikt,
+// zodat de popup vanuit de Status-kaart exact dezelfde details toont.
+const stepWaar = {
+  time:'16:23', num:null, name:'Constatering incident - Waar',
+  detail:'Volkeraksluizen - MIDDENSLUIS', roles:['HP'],
+  form:{
+    gebeurtenis:'Constatering incident', datum:'28-04-2026', tijd:'16:22',
+    section:'Waar', primaryLabel:'Naam*', primaryValue:'Volkeraksluizen - MIDDENSLUIS',
+    showIcon:true, secondaryLabel:'Nadere specifieke locatie', secondaryValue:''
+  }
+};
+const stepWie = {
+  time:'16:56', num:null, name:'Constatering incident - Wie',
+  detail:'', roles:['DB'],
+  form:{
+    gebeurtenis:'Constatering incident', datum:'28-04-2026', tijd:'16:56',
+    section:'Wie', primaryLabel:'Naam*', primaryValue:'-',
+    showIcon:false, secondaryLabel:'Rol', secondaryValue:''
+  }
+};
+const stepWat = {
+  time:'17:09', num:null, name:'Constatering incident - Wat',
+  detail:'Mens en dier in nood', roles:['DB'],
+  form:{
+    gebeurtenis:'Constatering incident', datum:'29-04-2026', tijd:'17:09',
+    section:'Wat', primaryLabel:'Omschrijving*', primaryValue:'Mens en dier in nood',
+    showIcon:false, secondaryLabel:'Toelichting', secondaryValue:''
+  }
+};
+
+const events = [
+  {
+    id:'40685892', type:'incident', title:'Incident - Volkeraksluizen - MIDDENSLUIS',
+    desc:'Mens en dier in nood van 28-04-2026 16:22 verwacht tot onbekend',
+    status:'behandeling', statusLabel:'In behandeling', badge:'Fase 1', selected:true,
+    detail:{
+      titel:'Incident - Volkeraksluizen - MIDDENSLUIS - Mens en dier in nood',
+      opDatum:'Op 28-04-2026 16:22',
+      dossier:'Dossier #40685892 In behandeling',
+      protocol:[
+        ['Constatering','28-04-2026 16:22'],
+        ['Eerste contact hulpverlener','29-04-2026 17:09'],
+        ['Contact OvD','11-05-2026 09:10'],
+        ['Status','In behandeling'],
+        ['Fase','1'],
+        ['Looptijd (uu:mm)','1751:08'],
+        ['Einde','-'],
+      ],
+      waar:{
+        naam:'Volkeraksluizen - MIDDENSLUIS',
+        nadere:'Bij de noordelijke sluisdeur',
+        mvl:['RWS 34','RWS 50'],
+        coords:{
+          latlon:'51.982963, 5.379610',
+          xy:'157.420 / 445.010',
+          gradenMinuten:"51°58.978'N 5°22.777'E"
+        }
+      },
+      wat:'dfdf',
+      wie:{
+        betrokkenen:[
+          {label:'Tonie 5', icons:['dot','boat']},
+          {label:'Andreas', icons:['boat']},
+          {label:'Amerongen', icons:['check']},
+        ],
+        hulpverleners:['112','Ambulance','IL&T']
+      },
+      timeline:[
+        {date:'10-07-2026', steps:[
+          {time:'15:08', num:'6', name:'Aard ongeval', detail:'Geen Scheepsongeval - Arbeidsongeval - Arbeidsongeval', roles:['RV','DB'],
+            form:{
+              type:'fields',
+              columns:[
+                [ {label:'Gebeurtenis*', value:'Aard ongeval'}, {label:'Categorie*', value:'Arbeidsongeval'}, {label:'Aard*', value:'Arbeidsongeval'} ],
+                [ {label:'Datum*', value:'10-07-2026', inline:true}, {label:'Tijd*', value:'15:07', inline:true} ],
+                [ {label:'Toelichting*', value:'sddds'} ],
+              ]
+            }
+          },
+        ]},
+        {date:'09-07-2026', steps:[
+          {time:'13:54', num:'1', name:'Informatiebericht', detail:'1', roles:['RV','DB']},
+        ]},
+        {date:'11-05-2026', steps:[
+          {time:'10:16', num:null, name:'Inzet Mobiel Verkeersleider', detail:'RWS-900 (06 12345678)', roles:['WY']},
+          {time:'09:10', num:'1', name:'Contact Officier van Dienst', detail:'', roles:['WY']},
+        ]},
+        {date:'29-04-2026', steps:[
+          {time:'17:10', num:null, name:'Contact hulpverlener', detail:'Aannemer', roles:['DB']},
+          {time:'17:10', num:null, name:'Informatiebericht', detail:'zxzxzx', roles:['DB']},
+          {time:'17:10', num:null, name:'Contact hulpverlener', detail:'Kustwacht', roles:['DB']},
+          {time:'17:10', num:null, name:'Contact hulpverlener', detail:'KNRM', roles:['DB']},
+          {time:'17:09', num:null, name:'Contact hulpverlener', detail:'IL&T', roles:['DB']},
+          {time:'17:09', num:null, name:'Aanvullende incident types', detail:'Ongeval met gevaarlijke stoffen', roles:['DB']},
+          {time:'17:09', num:null, name:'Fase gewijzigd', detail:'Fase 1', roles:['DB']},
+          {time:'17:09', num:null, name:'GRIP wijzigen', detail:'GRIP 1', roles:['DB']},
+          stepWat,
+          {time:'17:09', num:null, name:'Informatiebericht', detail:'dfdf', roles:['DB']},
+        ]},
+        {date:'28-04-2026', steps:[
+          stepWie,
+          stepWaar,
+        ]},
+      ]
+    }
+  },
+  {
+    id:'91572781', type:'incident', title:'Incident - 51.5052, 4.2189',
+    desc:'Van 26-06-2026 08:50 verwacht tot onbekend',
+    status:'behandeling', statusLabel:'In behandeling', badge:'Fase 0',
+    detail:{
+      titel:'Incident - 51.5052, 4.2189',
+      opDatum:'Op 26-06-2026 08:50',
+      dossier:'Dossier #91572781 In behandeling',
+      protocol:[
+        ['Constatering','26-06-2026 08:50'],
+        ['Eerste contact hulpverlener','-'],
+        ['Contact OvD','-'],
+        ['Status','In behandeling'],
+        ['Fase','0'],
+        ['Looptijd (uu:mm)','322:28'],
+        ['Einde','-'],
+      ],
+      waar:'51.5052, 4.2189',
+      wat:'-',
+      wie:'-',
+      timeline:[
+        {date:'26-06-2026', steps:[
+          {time:'08:50', num:null, name:'Constatering incident - Waar', detail:'51.5052, 4.2189', roles:['DB']},
+        ]},
+      ]
+    }
+  },
+  {id:'080726-000005', type:'beperking', title:'Beperking - Krammersluizen - ZUIDSLUIS',
+    desc:'Calamiteit/incident/aanvraag van 08-07-2026 11:08 verwacht tot onbekend',
+    status:'aangemeld', statusLabel:'Aangemeld', badge:'Prio -'},
+  {id:'080726-000004', type:'beperking', title:'Beperking - Krammersluizen - JACHTENSLUIS Z',
+    desc:'Gepland onderhoud van 08-07-2026 11:06 verwacht tot onbekend',
+    status:'aangemeld', statusLabel:'Aangemeld', badge:'Prio -'},
+  {id:'070726-000004', type:'beperking', title:'Beperking - Volkeraksluizen - MIDDENSLUIS',
+    desc:'Storing van 07-07-2026 16:47 verwacht tot onbekend',
+    status:'aangemeld', statusLabel:'Aangemeld', badge:'Prio -'},
+  {id:'030726-000000', type:'stremming', title:'Stremming - Hansweert, sluis - OOSTSLUIS',
+    desc:'Gepland onderhoud van 03-07-2026 09:41 verwacht tot 03-07-2026 13:41',
+    status:'aangemeld', statusLabel:'Aangemeld', badge:'Prio -'},
+  {id:'200426-0004e7', type:'beheersmaatregel', title:'Beheersmaatregel - Sluis Veere - KLEINE SLUIS',
+    desc:'Van 09-07-2026 18:04 verwacht tot onbekend',
+    status:'behandeling', statusLabel:'In behandeling', badge:'-'},
+  {id:'', type:'beperking', title:'Beperking - Sluis Veere - KLEINE SLUIS',
+    desc:'Calamiteit/incident/aanvraag van 22-06-2026 15:18 verwacht tot onbekend',
+    status:'aangemeld', statusLabel:'Aangemeld', badge:'Prio -'},
+  {id:'190626-000000', type:'beheersmaatregel', title:'Beheersmaatregel - Zandkreek sluis - ZANDKREEKSLUIS',
+    desc:'Van 02-07-2026 18:00 verwacht tot onbekend',
+    status:'behandeling', statusLabel:'In behandeling', badge:'-'},
+  {id:'', type:'beperking', title:'Beperking - Volkeraksluizen - OOSTSLUIS',
+    desc:'Geen bedienaar van 25-06-2026 09:26 verwacht tot onbekend',
+    status:'aangemeld', statusLabel:'Aangemeld', badge:'Prio -'},
+  {id:'', type:'stremming', title:'Stremming - Volkeraksluizen - OOSTSLUIS - DEELKOLK Z',
+    desc:'Gepland onderhoud van 19-06-2026 13:20 verwacht tot 19-06-2026 17:20',
+    status:'aangemeld', statusLabel:'Aangemeld', badge:'Prio -'},
+];
+
+let selectedIndex = 0;
+let currentTab = 'actueel';
+let listCollapsed = false;
+let infoCollapsed = false;
+const TABLET_MAX = 1024;
+let wasNarrow = window.innerWidth <= TABLET_MAX;
+
+// Wanneer een gloednieuwe gebeurtenis (bv. Overtreding) wordt aangemaakt via
+// +NIEUW, staat die nog niet in de linker lijst. adhocSelection houdt deze
+// tijdelijk vast zodat renderRight() 'm kan tonen; een klik in de lijst
+// maakt dit weer leeg.
+let adhocSelection = null;
+let stepUidCounter = 0;
+
+// Concept-opmerking: pas na Opslaan wordt deze echt aan de tijdlijn toegevoegd.
+let draftOpmerkingStep = null;
+let draftOpmerkingEv = null;
+
+// Concept "Inzet Mobiel Verkeersleider" (bij Overtreding): idem, pas na
+// Opslaan echt toegevoegd aan de tijdlijn én aan het Waar-blokje.
+let draftMvlStep = null;
+let draftMvlEv = null;
+
+const VERVOLG_MENU = [
+  {section:'Melding', items:['Waar','Wie','Wat','Typering incident','Omstandigheden','Omgevingseffect','Milieueffect']},
+  {section:'Registratie voor scheepsongeval', items:[
+    'Schade',
+    'Vaarwegsituatie',
+    'Aard ongeval',
+    'Handhaving'
+  ]},
+  {section:'Afhandeling', items:['Fase','Grip','Contact OVD','Inzet MVL','Hulpdiensten','Aanvullende incidenttypes','Intrekken incident','Afsluiten incident']},
+];
+
+/* ============ RENDER LIST ============ */
+const listEl = document.getElementById('eventList');
+
+let historyEvents = [];
+let historySelectedIndex = 0;
+
+function eventItemRowHtml(ev, isSelected, idx){
+  return `
+    <div class="event-item ${isSelected?'selected':''}" data-idx="${idx}">
+      <div class="event-id">${ev.id}</div>
+      <div class="event-row">
+        <div class="event-icon">${ICONS[ev.type]}</div>
+        <div class="event-body">
+          <div class="event-title-row">
+            <div class="event-title">${ev.title}</div>
+            <div class="event-status ${ev.status}">${ev.statusLabel}</div>
+          </div>
+          <div class="event-desc-row">
+            <div class="event-desc">${ev.desc}</div>
+            <div class="event-badge">${ev.badge}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderList(){
+  if(currentTab === 'historie'){
+    if(!historyEvents.length){
+      listEl.innerHTML = `<div class="empty-tab-msg">Nog geen gebeurtenissen in historie</div>`;
+      return;
+    }
+    listEl.innerHTML = historyEvents.map((ev,i) => eventItemRowHtml(ev, i===historySelectedIndex, i)).join('');
+    listEl.querySelectorAll('.event-item').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        historySelectedIndex = parseInt(el.dataset.idx);
+        renderList();
+        renderRight();
+      });
+    });
+    return;
+  }
+
+  if(currentTab !== 'actueel'){
+    listEl.innerHTML = `<div class="empty-tab-msg">Nog niet beschikbaar in prototype</div>`;
+    return;
+  }
+
+  listEl.innerHTML = events.map((ev,i) => eventItemRowHtml(ev, !adhocSelection && i===selectedIndex, i)).join('');
+
+  listEl.querySelectorAll('.event-item').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      selectedIndex = parseInt(el.dataset.idx);
+      adhocSelection = null;
+      renderList();
+      renderRight();
+    });
+  });
+}
+
+/* ============ RENDER RIGHT PANEL ============ */
+const rightEl = document.getElementById('rightPanel');
+
+function placeholderSVG(){
+  return `<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+    <rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/>
+    <path d="M8 14l3 3 5-6" stroke-dasharray="1 3"/>
+  </svg>`;
+}
+
+function setInfoCollapsed(collapsed){
+  infoCollapsed = collapsed;
+  const wrap = document.getElementById('infoCardsWrap');
+  const toggle = document.getElementById('dossierToggle');
+  if(wrap) wrap.classList.toggle('collapsed', collapsed);
+  if(toggle) toggle.classList.toggle('open', !collapsed);
+}
+
+const CHIP_ICONS = {
+  dot: `<span class="dot"></span>`,
+  boat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15l1.5 4.5a2 2 0 001.9 1.5h11.2a2 2 0 001.9-1.5L21 15"/><path d="M5 15l1-7h12l1 7"/><path d="M12 8V3"/><path d="M9 5h6"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9.5"/><polyline points="8 12.5 11 15.5 16 9"/></svg>`,
+};
+
+function chipHtml(label, icons){
+  const iconsHtml = (icons||[]).map(i=>CHIP_ICONS[i]||'').join('');
+  return `<span class="chip">${iconsHtml}${label}</span>`;
+}
+
+function renderWaarBody(w){
+  if(typeof w !== 'object'){
+    return `<div class="info-plain">${w}</div>`;
+  }
+  const mvlHtml = (w.mvl && w.mvl.length) ? `
+    <div class="chip-group-label">Inzet mobiel verkeersleider</div>
+    <div class="chip-row">${w.mvl.map(m=>chipHtml(m)).join('')}</div>
+  ` : '';
+  return `
+    <div class="waar-name">${w.naam}</div>
+    ${w.nadere ? `<div class="waar-sub">${w.nadere}</div>` : ''}
+    ${mvlHtml}
+  `;
+}
+
+function renderWieBody(w){
+  if(typeof w !== 'object'){
+    return `<div class="${w==='-'?'info-empty':'info-plain'}">${w}</div>`;
+  }
+  const betrokkenenHtml = (w.betrokkenen && w.betrokkenen.length) ? `
+    <div class="chip-row">${w.betrokkenen.map(b=>chipHtml(b.label, b.icons)).join('')}</div>
+  ` : '';
+  const hulpHtml = (w.hulpverleners && w.hulpverleners.length) ? `
+    <div class="chip-group-label">Hulpverleners</div>
+    <div class="chip-row">${w.hulpverleners.map(h=>chipHtml(h)).join('')}</div>
+  ` : '';
+  return betrokkenenHtml + hulpHtml;
+}
+
+// Berekent de titel/subtitel van compacte gebeurtenissen (Overtreding/
+// Watermanagement/Melding) live vanuit de actuele (eventueel gewijzigde)
+// gegevens van de hoofd-processtap, in plaats van een vaste tekst die alleen
+// bij het aanmaken werd vastgelegd.
+const COMPACT_TYPES = ['overtreding','watermanagement','melding'];
+
+// Geeft de gebeurtenis die op dit moment rechts getoond wordt (rekening
+// houdend met tab en concept-selectie).
+function getCurrentEv(){
+  return currentTab === 'historie'
+    ? historyEvents[historySelectedIndex]
+    : (adhocSelection || events[selectedIndex]);
+}
+
+// Berekent de titel/subtitel van compacte gebeurtenissen (Overtreding/
+// Watermanagement/Melding) live vanuit de actuele (eventueel gewijzigde)
+// gegevens van de hoofd-processtap, in plaats van een vaste tekst die alleen
+// bij het aanmaken werd vastgelegd.
+function computeCompactHeader(ev){
+  const d = ev.detail;
+  let mainStep = null;
+  for(const g of d.timeline){
+    for(const s of g.steps){
+      if(s.form && s.form.type === ev.type){ mainStep = s; break; }
+    }
+    if(mainStep) break;
+  }
+  if(!mainStep) return { line1: d.headerLine1, line2: d.headerLine2 };
+
+  const f = mainStep.form;
+  if(ev.type === 'watermanagement'){
+    return { line1: `${f.tijd} · Watermanagement · ${f.activiteit}`, line2: f.locatie };
+  }
+  if(ev.type === 'overtreding'){
+    return { line1: `${f.tijd} · Overtreding · ${f.varendeEenheid}`, line2: f.reden };
+  }
+  if(ev.type === 'melding'){
+    return { line1: `${f.tijd} · Melding`, line2: f.soort };
+  }
+  return { line1: d.headerLine1, line2: d.headerLine2 };
+}
+
+// Werkt de titelbalk direct in de DOM bij (zonder het hele paneel opnieuw op
+// te bouwen) nadat een processtap is opgeslagen die de hoofdgegevens van een
+// compacte gebeurtenis bevat.
+function refreshCompactHeaderInPlace(){
+  const ev = getCurrentEv();
+  if(!ev || !COMPACT_TYPES.includes(ev.type)) return;
+  const h = computeCompactHeader(ev);
+  const h1El = document.querySelector('.incident-header h1');
+  const subEl = document.querySelector('.incident-header .op-datum');
+  if(h1El) h1El.textContent = h.line1;
+  if(subEl) subEl.textContent = h.line2;
+}
+
+function renderRight(){
+  const ev = getCurrentEv();
+  if(!ev || (ev.type !== 'incident' && !COMPACT_TYPES.includes(ev.type))){
+    const label = ev ? ev.title.split(' - ')[0] : 'Gebeurtenis';
+    rightEl.innerHTML = `
+      <div class="placeholder-panel">
+        ${placeholderSVG()}
+        <div class="msg">${label}</div>
+        <div class="sub">Nog niet beschikbaar in prototype</div>
+      </div>`;
+    return;
+  }
+
+  const d = ev.detail;
+
+  const protocolFields = d.protocol.map(([lab,val])=>`
+    <div class="info-field"><span class="lab">${lab}</span><span class="val">${val}</span></div>
+  `).join('');
+
+  const timelineHtml = d.timeline.map(group => `
+    <div class="date-row">${group.date}</div>
+    ${group.steps.map((s, si) => renderStep(s, group.date+'-'+si)).join('')}
+  `).join('');
+
+  let draftHtml = '';
+  if(draftOpmerkingEv === ev && draftOpmerkingStep){
+    const draftDatum = draftOpmerkingStep.form.datum;
+    const dateRowNeeded = !(d.timeline.length && d.timeline[0].date === draftDatum);
+    draftHtml = (dateRowNeeded ? `<div class="date-row">${draftDatum}</div>` : '') + renderDraftOpmerkingCardHtml(draftOpmerkingStep);
+  } else if(draftMvlEv === ev && draftMvlStep){
+    const draftDatum = draftMvlStep.form.datum;
+    const dateRowNeeded = !(d.timeline.length && d.timeline[0].date === draftDatum);
+    draftHtml = (dateRowNeeded ? `<div class="date-row">${draftDatum}</div>` : '') + renderDraftMvlCardHtml(draftMvlStep);
+  }
+
+  let headerHtml, infoCardsHtml;
+
+  if(COMPACT_TYPES.includes(ev.type)){
+    const compactHeader = computeCompactHeader(ev);
+    headerHtml = `
+    <div class="incident-header">
+      <div>
+        <h1>${compactHeader.line1}</h1>
+        <div class="op-datum">${compactHeader.line2}</div>
+      </div>
+      <div class="dossier-toggle ${infoCollapsed?'':'open'}" id="dossierToggle">
+        <span class="dossier">${d.dossier}</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>`;
+    infoCardsHtml = `
+    <div class="info-cards-wrap ${infoCollapsed?'collapsed':''}" id="infoCardsWrap">
+      <div class="info-cards cols-3">
+        <div class="info-card">
+          <div class="head">
+            <span>Status</span>
+          </div>
+          <div class="body">${protocolFields}</div>
+        </div>
+        <div class="info-card">
+          <div class="head"><span>Waar</span></div>
+          <div class="body">${renderWaarBody(d.waar)}</div>
+        </div>
+        <div class="info-card">
+          <div class="head"><span>Wie</span></div>
+          <div class="body">${renderWieBody(d.wie)}</div>
+        </div>
+      </div>
+    </div>`;
+  } else {
+    headerHtml = `
+    <div class="incident-header">
+      <div>
+        <h1>${d.titel}</h1>
+        <div class="op-datum">${d.opDatum}</div>
+      </div>
+      <div class="dossier-toggle ${infoCollapsed?'':'open'}" id="dossierToggle">
+        <span class="dossier">${d.dossier}</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>`;
+    infoCardsHtml = `
+    <div class="info-cards-wrap ${infoCollapsed?'collapsed':''}" id="infoCardsWrap">
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="head">
+            <span>Status</span>
+            <svg class="protocol-open-btn" id="protocolOpenBtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 3v2h6V3"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+          </div>
+          <div class="body">${protocolFields}</div>
+        </div>
+        <div class="info-card">
+          <div class="head">
+            <span>Waar</span>
+            ${typeof d.waar === 'object' ? `
+              <div class="info-icon-wrap">
+                <svg class="info-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.9" fill="currentColor" stroke="none"/></svg>
+                <div class="coord-tooltip">
+                  <div class="coord-row"><span>Lat / Lon</span><span class="v">${d.waar.coords.latlon}</span></div>
+                  <div class="coord-row"><span>X / Y (RD)</span><span class="v">${d.waar.coords.xy}</span></div>
+                  <div class="coord-row"><span>Graden-minuten (zee)</span><span class="v">${d.waar.coords.gradenMinuten}</span></div>
+                </div>
+              </div>` : ''}
+          </div>
+          <div class="body">${renderWaarBody(d.waar)}</div>
+        </div>
+        <div class="info-card">
+          <div class="head"><span>Wat</span></div>
+          <div class="body"><div class="info-plain">${d.wat}</div></div>
+        </div>
+        <div class="info-card">
+          <div class="head"><span>Wie</span></div>
+          <div class="body">${renderWieBody(d.wie)}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  rightEl.innerHTML = `
+    ${headerHtml}
+    ${infoCardsHtml}
+
+    <div class="action-row">
+      <div class="action-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 14a4 4 0 005.66 0l3-3a4 4 0 00-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 00-5.66 0l-3 3a4 4 0 005.66 5.66l1-1"/></svg>
+        Gekoppelde gebeurtenis
+      </div>
+      <div class="action-link" id="opmerkingBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Opmerking
+      </div>
+      <div class="action-link vervolg-wrap" id="vervolgWrap">
+        <span id="vervolgTrigger" style="display:flex;align-items:center;gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          Vervolg
+        </span>
+        <div class="vervolg-menu" id="vervolgMenu">
+          ${(() => {
+            const menu = getVervolgMenuForType(ev.type);
+            if(!menu.length){
+              return `<div class="vervolg-empty">Geen vervolgacties beschikbaar</div>`;
+            }
+            return menu.map(sec => `
+              <div class="vervolg-section-label">${sec.section}</div>
+              ${sec.items.map(it=>{
+                const label = typeof it === 'string' ? it : it.label;
+                const dot = typeof it === 'object' && it.dot ? '<span class="dot"></span>' : '';
+                return `<div class="vervolg-item" data-item="${label}">
+                  <span style="display:flex;align-items:center;gap:8px;">${dot}${label}</span>
+                  <svg class="pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                </div>`;
+              }).join('')}
+            `).join('<div class="vervolg-divider"></div>');
+          })()}
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline">${draftHtml}${timelineHtml}</div>
+  `;
+
+  // wire up step toggles + koppel stapdata aan het DOM-element (nodig voor edit mode)
+  const flatSteps = [];
+  d.timeline.forEach(g => g.steps.forEach(s => flatSteps.push(s)));
+  rightEl.querySelectorAll('.step-card:not(#draftOpmerkingCard):not(#draftMvlCard)').forEach((card, idx)=>{
+    card._stepData = flatSteps[idx];
+    card.querySelector('.step-head').addEventListener('click', ()=>{
+      const isOpen = card.classList.contains('open');
+      rightEl.querySelectorAll('.step-card.open').forEach(c=>c.classList.remove('open'));
+      if(!isOpen) card.classList.add('open');
+    });
+    wireStepBodyLinks(card);
+  });
+
+  // wire up dossier / info card collapse toggle (title bar)
+  const dossierToggle = document.getElementById('dossierToggle');
+  if(dossierToggle){
+    dossierToggle.addEventListener('click', ()=>{
+      setInfoCollapsed(!infoCollapsed);
+    });
+  }
+
+  // wire up protocol - volledig overzicht popup
+  const protocolOpenBtn = document.getElementById('protocolOpenBtn');
+  if(protocolOpenBtn){
+    protocolOpenBtn.addEventListener('click', ()=> openProtocolModal(d));
+  }
+
+  // overige actie-links (nog geen functionaliteit in prototype)
+  rightEl.querySelectorAll('.action-row > .action-link:not(.vervolg-wrap):not(#opmerkingBtn)').forEach(link=>{
+    link.addEventListener('click', ()=> alert('Nog niet beschikbaar in prototype'));
+  });
+
+  // +Opmerking: concept-processtap klaarzetten, direct in edit mode
+  const opmerkingBtn = document.getElementById('opmerkingBtn');
+  if(opmerkingBtn){
+    opmerkingBtn.addEventListener('click', ()=> addOpmerking(ev));
+  }
+  wireDraftOpmerkingCard(ev);
+  wireDraftMvlCard(ev);
+
+  // wire up Vervolg dropdown
+  const vervolgTrigger = document.getElementById('vervolgTrigger');
+  const vervolgMenu = document.getElementById('vervolgMenu');
+  vervolgTrigger.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    vervolgMenu.classList.toggle('open');
+  });
+  vervolgMenu.addEventListener('click', (e)=>e.stopPropagation());
+  rightEl.querySelectorAll('.vervolg-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      vervolgMenu.classList.remove('open');
+      const itemLabel = item.dataset.item;
+      if(ev.type === 'melding' && (itemLabel === 'Sleutelinname' || itemLabel === 'Persoon verlaat object')){
+        endMelding(ev, itemLabel);
+      } else if(ev.type === 'overtreding' && itemLabel === 'Inzet Mobiel Verkeersleider'){
+        addMvlStep(ev);
+      } else {
+        alert('Nog niet beschikbaar in prototype');
+      }
+    });
+  });
+  document.addEventListener('click', ()=>{
+    vervolgMenu.classList.remove('open');
+  });
+}
+
+function buildOvertredingReadHtml(s){
+  const f = s.form;
+  return `
+    <div class="form-fields-grid" style="grid-template-columns:2fr 1fr;">
+      <div class="form-fields-col">
+        <div class="form-row-inline">
+          <div class="form-field"><div class="flabel">Gebeurtenis</div><div class="fval">${f.gebeurtenis}</div></div>
+        </div>
+        <div class="form-row-inline">
+          <div class="form-field"><div class="flabel">Datum*</div><div class="fval">${f.datum}</div></div>
+          <div class="form-field"><div class="flabel">Tijd*</div><div class="fval">${f.tijd}</div></div>
+        </div>
+        <div class="form-field"><div class="flabel">Deliquent (Naam overtreder)</div><div class="fval">${f.varendeEenheid}</div></div>
+        <div class="form-field"><div class="flabel">Reden</div><div class="fval">${f.reden}</div></div>
+        <div class="form-field">
+          <div class="flabel">Locatie</div>
+          <div class="fval fval-with-icon">
+            <span>${f.locatie}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8b73d" stroke-width="1.8"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>
+          </div>
+        </div>
+        ${f.locatieSpecificatie ? `<div class="form-field"><div class="flabel">Locatie specificatie</div><div class="fval">${f.locatieSpecificatie}</div></div>` : ''}
+        <div class="read-checkbox-row">
+          <span class="${f.waarschuwingGegeven?'on':''}">${f.waarschuwingGegeven?'&#9679;':'&#9675;'} Waarschuwing gegeven</span>
+          <span class="${f.opvolgingNodig?'on':''}">${f.opvolgingNodig?'&#9679;':'&#9675;'} Opvolging nodig</span>
+        </div>
+      </div>
+      <div class="form-fields-col">
+        <div class="form-field">
+          <div class="flabel">Toelichting*</div>
+          <div class="fval ${f.toelichting?'':'empty'}">${f.toelichting || '&nbsp;'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="step-footer">
+      <div class="footer-tabs">${buildFooterTabsHtml(s)}</div>
+      <div class="footer-actions">
+        <a class="wijzigen-link">&#9998; Wijzigen</a>
+      </div>
+    </div>
+  `;
+}
+
+const REDEN_OPTIONS = [
+  'Door rood licht varen',
+  'Schroef aan laten staan',
+  'Niet opvolgen verkeersaanwijzing',
+  'Intimidatie medewerker',
+  'Anders'
+];
+
+function buildOvertredingEditHtml(s){
+  const f = s.form;
+  const rn = 'vaarttype-' + (s.__uid = s.__uid || ++stepUidCounter);
+  const isBeroeps = f.vaarttype !== 'Recreatievaart';
+  const redenOpties = REDEN_OPTIONS.includes(f.reden) ? REDEN_OPTIONS : [f.reden, ...REDEN_OPTIONS];
+  return `
+    <div class="edit-form">
+      <div>
+        <div class="form-row-inline">
+          <div class="edit-field grow"><div class="flabel">Gebeurtenis*</div><div class="fval-static">${f.gebeurtenis}</div></div>
+          <div class="edit-field"><div class="flabel">Datum*</div><input class="edit-input f-datum" type="text" value="${f.datum}"></div>
+          <div class="edit-field"><div class="flabel">Tijd*</div><input class="edit-input f-tijd" type="text" value="${f.tijd}"></div>
+        </div>
+        <div class="edit-radio-group">
+          <label class="edit-radio"><input type="radio" name="${rn}" class="f-vaarttype" value="Beroepsvaart" ${isBeroeps?'checked':''}> Beroepsvaart</label>
+          <label class="edit-radio"><input type="radio" name="${rn}" class="f-vaarttype" value="Recreatievaart" ${!isBeroeps?'checked':''}> Recreatievaart</label>
+        </div>
+
+        <div class="vessel-field-beroeps" style="display:${isBeroeps?'block':'none'}">
+          <div class="edit-field loc-field-wrap">
+            <div class="flabel">Naam vaartuig*</div>
+            <div class="loc-input-wrap">
+              <input class="edit-input vessel-search-input" type="text" value="${isBeroeps?f.varendeEenheid:''}" placeholder="Zoek op naam, MMSI, IMO..." autocomplete="off">
+              <svg class="loc-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+              <svg class="loc-clear-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="#14161c" stroke-width="1.8"/></svg>
+            </div>
+            <div class="loc-dropdown vessel-dropdown"></div>
+          </div>
+        </div>
+        <div class="vessel-field-recreatie" style="display:${!isBeroeps?'block':'none'}">
+          <div class="edit-field">
+            <div class="flabel">Varende eenheid (NAAM, IMO)</div>
+            <input class="edit-input f-eenheid-recreatie" type="text" value="${!isBeroeps?f.varendeEenheid:''}">
+          </div>
+        </div>
+
+        <div class="edit-field">
+          <div class="flabel">Reden*</div>
+          <select class="edit-input f-reden">
+            ${redenOpties.map(r=>`<option value="${r}" ${f.reden===r?'selected':''}>${r}</option>`).join('')}
+          </select>
+        </div>
+        <div class="edit-field loc-field-wrap">
+          <div class="flabel">Locatie*</div>
+          <div class="loc-input-wrap">
+            <input class="edit-input f-locatie loc-search-input" type="text" value="${f.locatie}" placeholder="Zoek op objecten, vaarwegen, etc." autocomplete="off">
+            <svg class="loc-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+            <svg class="loc-clear-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="#14161c" stroke-width="1.8"/></svg>
+          </div>
+          <div class="loc-dropdown"></div>
+        </div>
+        <div class="edit-field">
+          <div class="loc-field-label-row">
+            <div class="flabel">Locatie specificatie</div>
+            <div class="loc-map-btn" style="display:${f.locatieIsVaarweg?'flex':'none'}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+              Naar kaart
+            </div>
+          </div>
+          <input class="edit-input f-locatie-spec" type="text" value="${f.locatieSpecificatie||''}">
+        </div>
+        <div class="edit-checkbox-group">
+          <label class="edit-checkbox"><input type="checkbox" class="f-waarschuwing" ${f.waarschuwingGegeven?'checked':''}> Waarschuwing gegeven</label>
+          <label class="edit-checkbox"><input type="checkbox" class="f-opvolging" ${f.opvolgingNodig?'checked':''}> Opvolging nodig</label>
+        </div>
+      </div>
+      <div class="toelichting-col">
+        <div class="edit-field"><div class="flabel">Toelichting*</div><textarea class="edit-textarea f-toelichting">${f.toelichting||''}</textarea></div>
+      </div>
+    </div>
+    <div class="edit-footer">
+      <div class="edit-btn edit-cancel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+        Annuleren
+      </div>
+      <div class="edit-btn primary edit-save">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+        Opslaan
+      </div>
+    </div>
+  `;
+}
+
+/* ============ Watermanagement kaartje: read/edit ============ */
+const WATERMANAGEMENT_ACTIVITEITEN = ['Pompen','Spuien','Stoney','Peilen'];
+
+function buildWatermanagementReadHtml(s){
+  const f = s.form;
+  return `
+    <div class="form-fields-grid" style="grid-template-columns:2fr 1fr;">
+      <div class="form-fields-col">
+        <div class="form-row-inline">
+          <div class="form-field"><div class="flabel">Gebeurtenis</div><div class="fval">${f.gebeurtenis}</div></div>
+        </div>
+        <div class="form-row-inline">
+          <div class="form-field"><div class="flabel">Datum*</div><div class="fval">${f.datum}</div></div>
+          <div class="form-field"><div class="flabel">Tijd*</div><div class="fval">${f.tijd}</div></div>
+        </div>
+        <div class="form-field"><div class="flabel">Activiteit</div><div class="fval">${f.activiteit}</div></div>
+        <div class="form-field">
+          <div class="flabel">Locatie</div>
+          <div class="fval fval-with-icon">
+            <span>${f.locatie}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8b73d" stroke-width="1.8"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>
+          </div>
+        </div>
+        ${f.locatieSpecificatie ? `<div class="form-field"><div class="flabel">Locatie specificatie</div><div class="fval">${f.locatieSpecificatie}</div></div>` : ''}
+      </div>
+      <div class="form-fields-col">
+        <div class="form-field">
+          <div class="flabel">Toelichting*</div>
+          <div class="fval ${f.toelichting?'':'empty'}">${f.toelichting || '&nbsp;'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="step-footer">
+      <div class="footer-tabs">${buildFooterTabsHtml(s)}</div>
+      <div class="footer-actions">
+        <a class="wijzigen-link">&#9998; Wijzigen</a>
+      </div>
+    </div>
+  `;
+}
+
+function buildWatermanagementEditHtml(s){
+  const f = s.form;
+  return `
+    <div class="edit-form">
+      <div>
+        <div class="form-row-inline">
+          <div class="edit-field grow"><div class="flabel">Gebeurtenis*</div><div class="fval-static">${f.gebeurtenis}</div></div>
+          <div class="edit-field"><div class="flabel">Datum*</div><input class="edit-input f-datum" type="text" value="${f.datum}"></div>
+          <div class="edit-field"><div class="flabel">Tijd*</div><input class="edit-input f-tijd" type="text" value="${f.tijd}"></div>
+        </div>
+        <div class="edit-field">
+          <div class="flabel">Activiteit*</div>
+          <select class="edit-input f-activiteit">
+            ${WATERMANAGEMENT_ACTIVITEITEN.map(a=>`<option value="${a}" ${f.activiteit===a?'selected':''}>${a}</option>`).join('')}
+          </select>
+        </div>
+        <div class="edit-field loc-field-wrap">
+          <div class="flabel">Locatie*</div>
+          <div class="loc-input-wrap">
+            <input class="edit-input f-locatie loc-search-input" type="text" value="${f.locatie}" placeholder="Zoek op objecten, vaarwegen, etc." autocomplete="off">
+            <svg class="loc-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+            <svg class="loc-clear-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="#14161c" stroke-width="1.8"/></svg>
+          </div>
+          <div class="loc-dropdown"></div>
+        </div>
+        <div class="edit-field">
+          <div class="loc-field-label-row">
+            <div class="flabel">Locatie specificatie</div>
+            <div class="loc-map-btn" style="display:${f.locatieIsVaarweg?'flex':'none'}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+              Naar kaart
+            </div>
+          </div>
+          <input class="edit-input f-locatie-spec" type="text" value="${f.locatieSpecificatie||''}">
+        </div>
+      </div>
+      <div class="toelichting-col">
+        <div class="edit-field"><div class="flabel">Toelichting*</div><textarea class="edit-textarea f-toelichting">${f.toelichting||''}</textarea></div>
+      </div>
+    </div>
+    <div class="edit-footer">
+      <div class="edit-btn edit-cancel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+        Annuleren
+      </div>
+      <div class="edit-btn primary edit-save">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+        Opslaan
+      </div>
+    </div>
+  `;
+}
+
+/* ============ Melding kaartje: read/edit ============ */
+const MELDING_SOORTEN = ['Sleuteluitgifte','Persoon op object','Bedienregiem','Werkzaamheden'];
+
+const MELDING_VERVOLG_MENU = [
+  {section:'Afhandeling', items:['Sleutelinname','Persoon verlaat object']},
+];
+
+const OVERTREDING_VERVOLG_MENU = [
+  {section:'Afhandeling', items:['Inzet Mobiel Verkeersleider']},
+];
+
+// Watermanagement heeft nog geen vervolgacties (bewust leeg).
+// De incident-acties zelf blijven wél gedefinieerd (VERVOLG_MENU) voor later gebruik.
+function getVervolgMenuForType(type){
+  if(type === 'melding') return MELDING_VERVOLG_MENU;
+  if(type === 'overtreding') return OVERTREDING_VERVOLG_MENU;
+  if(type === 'watermanagement') return [];
+  return VERVOLG_MENU;
+}
+
+function buildMeldingReadHtml(s){
+  const f = s.form;
+  return `
+    <div class="form-fields-grid" style="grid-template-columns:2fr 1fr;">
+      <div class="form-fields-col">
+        <div class="form-row-inline">
+          <div class="form-field"><div class="flabel">Gebeurtenis</div><div class="fval">${f.gebeurtenis}</div></div>
+        </div>
+        <div class="form-row-inline">
+          <div class="form-field"><div class="flabel">Datum*</div><div class="fval">${f.datum}</div></div>
+          <div class="form-field"><div class="flabel">Tijd*</div><div class="fval">${f.tijd}</div></div>
+        </div>
+        <div class="form-field"><div class="flabel">Soort melding</div><div class="fval">${f.soort}</div></div>
+      </div>
+      <div class="form-fields-col">
+        <div class="form-field">
+          <div class="flabel">Toelichting*</div>
+          <div class="fval ${f.toelichting?'':'empty'}">${f.toelichting || '&nbsp;'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="step-footer">
+      <div class="footer-tabs">${buildFooterTabsHtml(s)}</div>
+      <div class="footer-actions">
+        <a class="wijzigen-link">&#9998; Wijzigen</a>
+      </div>
+    </div>
+  `;
+}
+
+function buildMeldingEditHtml(s){
+  const f = s.form;
+  return `
+    <div class="edit-form">
+      <div>
+        <div class="form-row-inline">
+          <div class="edit-field grow"><div class="flabel">Gebeurtenis*</div><div class="fval-static">${f.gebeurtenis}</div></div>
+          <div class="edit-field"><div class="flabel">Datum*</div><input class="edit-input f-datum" type="text" value="${f.datum}"></div>
+          <div class="edit-field"><div class="flabel">Tijd*</div><input class="edit-input f-tijd" type="text" value="${f.tijd}"></div>
+        </div>
+        <div class="edit-field">
+          <div class="flabel">Soort melding*</div>
+          <select class="edit-input f-soort">
+            ${MELDING_SOORTEN.map(a=>`<option value="${a}" ${f.soort===a?'selected':''}>${a}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="toelichting-col">
+        <div class="edit-field"><div class="flabel">Toelichting*</div><textarea class="edit-textarea f-toelichting">${f.toelichting||''}</textarea></div>
+      </div>
+    </div>
+    <div class="edit-footer">
+      <div class="edit-btn edit-cancel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+        Annuleren
+      </div>
+      <div class="edit-btn primary edit-save">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+        Opslaan
+      </div>
+    </div>
+  `;
+}
+
+/* ============ Opmerking kaartje: read/edit ============ */
+function buildOpmerkingReadHtml(s){
+  const f = s.form;
+  return `
+    <div class="form-fields-grid" style="grid-template-columns:2fr 1fr;">
+      <div class="form-fields-col">
+        <div class="form-row-inline">
+          <div class="form-field"><div class="flabel">Gebeurtenis</div><div class="fval">${f.gebeurtenis}</div></div>
+        </div>
+        <div class="form-row-inline">
+          <div class="form-field"><div class="flabel">Datum*</div><div class="fval">${f.datum}</div></div>
+          <div class="form-field"><div class="flabel">Tijd*</div><div class="fval">${f.tijd}</div></div>
+        </div>
+        <div class="form-field"><div class="flabel">Titel*</div><div class="fval">${f.titel||'-'}</div></div>
+      </div>
+      <div class="form-fields-col">
+        <div class="form-field">
+          <div class="flabel">Opmerking*</div>
+          <div class="fval ${f.opmerking?'':'empty'}">${f.opmerking || '&nbsp;'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="step-footer">
+      <div class="footer-tabs">${buildFooterTabsHtml(s)}</div>
+      <div class="footer-actions">
+        <a class="wijzigen-link">&#9998; Wijzigen</a>
+      </div>
+    </div>
+  `;
+}
+
+function buildOpmerkingEditHtml(s){
+  const f = s.form;
+  return `
+    <div class="edit-form">
+      <div>
+        <div class="form-row-inline">
+          <div class="edit-field grow"><div class="flabel">Gebeurtenis*</div><div class="fval-static">${f.gebeurtenis}</div></div>
+          <div class="edit-field"><div class="flabel">Datum*</div><input class="edit-input f-datum" type="text" value="${f.datum}"></div>
+          <div class="edit-field"><div class="flabel">Tijd*</div><input class="edit-input f-tijd" type="text" value="${f.tijd}"></div>
+        </div>
+        <div class="edit-field">
+          <div class="flabel">Titel*</div>
+          <input class="edit-input f-titel" type="text" value="${f.titel||''}" placeholder="Waar gaat deze opmerking over?">
+        </div>
+      </div>
+      <div class="toelichting-col">
+        <div class="edit-field"><div class="flabel">Opmerking*</div><textarea class="edit-textarea f-opmerking">${f.opmerking||''}</textarea></div>
+      </div>
+    </div>
+    <div class="edit-footer">
+      <div class="edit-btn edit-cancel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+        Annuleren
+      </div>
+      <div class="edit-btn primary edit-save">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+        Opslaan
+      </div>
+    </div>
+  `;
+}
+
+// Zet een concept-opmerking klaar (nog NIET in de tijdlijn/lijst) en toont
+// 'm bovenaan in edit mode. Pas bij Opslaan wordt hij echt toegevoegd.
+function addOpmerking(ev){
+  if(!ev || !ev.detail) return;
+  const now = new Date();
+  const datum = `${pad2(now.getDate())}-${pad2(now.getMonth()+1)}-${now.getFullYear()}`;
+  const tijd = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+  draftOpmerkingStep = {
+    time:tijd, num:null, name:'Opmerking', detail:'', roles:['RV', randomCredential()],
+    form:{
+      type:'opmerking',
+      editable:true,
+      gebeurtenis:'Opmerking',
+      datum, tijd,
+      titel:'',
+      opmerking:''
+    }
+  };
+  draftOpmerkingEv = ev;
+  renderRight();
+}
+
+function renderDraftOpmerkingCardHtml(s){
+  return `
+    <div class="step-card open editing" id="draftOpmerkingCard">
+      <div class="step-head" style="cursor:default;">
+        <div class="step-time">${s.time}</div>
+        <div class="step-num" style="visibility:hidden;"></div>
+        <div class="step-name" id="draftStepNamePreview">${s.form.titel || s.name}</div>
+        <div class="step-detail"></div>
+        <div class="step-right">
+          ${s.roles.map(r=>`<span class="role-badge">${r}</span>`).join('')}
+        </div>
+      </div>
+      <div class="step-body" style="display:block;">${buildOpmerkingEditHtml(s)}</div>
+    </div>
+  `;
+}
+
+function wireDraftOpmerkingCard(ev){
+  const card = document.getElementById('draftOpmerkingCard');
+  if(!card) return;
+
+  const titelInput = card.querySelector('.f-titel');
+  const namePreview = card.querySelector('#draftStepNamePreview');
+  if(titelInput && namePreview){
+    titelInput.addEventListener('input', ()=>{
+      namePreview.textContent = titelInput.value.trim() ? `Opmerking - ${titelInput.value.trim()}` : 'Opmerking';
+    });
+  }
+
+  card.querySelector('.edit-cancel').addEventListener('click', ()=>{
+    draftOpmerkingStep = null;
+    draftOpmerkingEv = null;
+    renderRight();
+  });
+
+  card.querySelector('.edit-save').addEventListener('click', ()=>{
+    const s = draftOpmerkingStep;
+    s.form.datum = card.querySelector('.f-datum').value;
+    s.form.tijd = card.querySelector('.f-tijd').value;
+    s.form.titel = card.querySelector('.f-titel').value;
+    s.form.opmerking = card.querySelector('.f-opmerking').value;
+    s.time = s.form.tijd;
+    s.name = s.form.titel.trim() ? `Opmerking - ${s.form.titel.trim()}` : 'Opmerking';
+    s.detail = s.form.opmerking.slice(0, 60) + (s.form.opmerking.length > 60 ? '…' : '');
+
+    const d = ev.detail;
+    const datum = s.form.datum;
+    if(d.timeline.length && d.timeline[0].date === datum){
+      d.timeline[0].steps.unshift(s);
+    } else {
+      d.timeline.unshift({date:datum, steps:[s]});
+    }
+
+    draftOpmerkingStep = null;
+    draftOpmerkingEv = null;
+
+    // Een opmerking toevoegen aan een reeds bestaande gebeurtenis is een
+    // wijziging; bij een nog niet opgeslagen nieuwe gebeurtenis (adhocSelection)
+    // blijft de status gewoon Aangemeld tot de eerste keer opslaan.
+    if(ev !== adhocSelection){
+      markEventChanged(ev);
+    }
+
+    renderRight();
+  });
+}
+
+/* ============ Inzet Mobiel Verkeersleider (vervolgactie bij Overtreding) ============ */
+function buildMvlReadHtml(s){
+  const f = s.form;
+  return `
+    <div class="form-fields-grid" style="grid-template-columns:2fr 1fr;">
+      <div class="form-fields-col">
+        <div class="form-row-inline">
+          <div class="form-field"><div class="flabel">Gebeurtenis</div><div class="fval">${f.gebeurtenis}</div></div>
+        </div>
+        <div class="form-row-inline">
+          <div class="form-field"><div class="flabel">Datum*</div><div class="fval">${f.datum}</div></div>
+          <div class="form-field"><div class="flabel">Tijd*</div><div class="fval">${f.tijd}</div></div>
+        </div>
+        <div class="form-field"><div class="flabel">Vaartuig/werkplek</div><div class="fval">${f.vaartuigWerkplek}</div></div>
+        <div class="form-field"><div class="flabel">Telefoonnummer</div><div class="fval">${f.telefoonnummer||'-'}</div></div>
+      </div>
+      <div class="form-fields-col">
+        <div class="form-field">
+          <div class="flabel">Toelichting</div>
+          <div class="fval ${f.toelichting?'':'empty'}">${f.toelichting || '&nbsp;'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="step-footer">
+      <div class="footer-tabs">${buildFooterTabsHtml(s)}</div>
+      <div class="footer-actions">
+        <a class="wijzigen-link">&#9998; Wijzigen</a>
+      </div>
+    </div>
+  `;
+}
+
+function buildMvlEditHtml(s){
+  const f = s.form;
+  return `
+    <div class="edit-form">
+      <div>
+        <div class="form-row-inline">
+          <div class="edit-field grow"><div class="flabel">Gebeurtenis</div><div class="fval-static">${f.gebeurtenis}</div></div>
+          <div class="edit-field"><div class="flabel">Datum*</div><input class="edit-input f-datum" type="text" value="${f.datum}"></div>
+          <div class="edit-field"><div class="flabel">Tijd*</div><input class="edit-input f-tijd" type="text" value="${f.tijd}"></div>
+        </div>
+        <div class="edit-field">
+          <div class="flabel">Vaartuig/werkplek*</div>
+          <input class="edit-input f-vaartuig-werkplek" type="text" value="${f.vaartuigWerkplek||''}">
+        </div>
+        <div class="edit-field">
+          <div class="flabel">Telefoonnummer</div>
+          <input class="edit-input f-telefoonnummer" type="text" value="${f.telefoonnummer||''}">
+        </div>
+      </div>
+      <div class="toelichting-col">
+        <div class="edit-field"><div class="flabel">Toelichting*</div><textarea class="edit-textarea f-toelichting">${f.toelichting||''}</textarea></div>
+      </div>
+    </div>
+    <div class="edit-footer">
+      <div class="edit-btn edit-cancel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+        Annuleren
+      </div>
+      <div class="edit-btn primary edit-save">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+        Opslaan
+      </div>
+    </div>
+  `;
+}
+
+// Zet een concept "Inzet Mobiel Verkeersleider"-kaartje klaar (nog NIET in de
+// tijdlijn). Pas bij Opslaan wordt het echt toegevoegd én verschijnt de
+// inzet in het Waar-blokje van de infokaart (net als bij Incident).
+function addMvlStep(ev){
+  if(!ev || !ev.detail) return;
+  const now = new Date();
+  const datum = `${pad2(now.getDate())}-${pad2(now.getMonth()+1)}-${now.getFullYear()}`;
+  const tijd = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+  draftMvlStep = {
+    time:tijd, num:null, name:'Inzet Mobiel Verkeersleider', detail:'Vaartuig/werkplek (Telefoonnummer)', roles:['OPR', randomCredential()],
+    form:{
+      type:'mvl',
+      editable:true,
+      gebeurtenis:'Inzet Mobiel Verkeersleider',
+      datum, tijd,
+      vaartuigWerkplek:'',
+      telefoonnummer:'',
+      toelichting:''
+    }
+  };
+  draftMvlEv = ev;
+  renderRight();
+}
+
+function renderDraftMvlCardHtml(s){
+  return `
+    <div class="step-card open editing" id="draftMvlCard">
+      <div class="step-head" style="cursor:default;">
+        <div class="step-time">${s.time}</div>
+        <div class="step-num" style="visibility:hidden;"></div>
+        <div class="step-name">${s.name}</div>
+        <div class="step-detail">${s.detail}</div>
+        <div class="step-right">
+          ${s.roles.map(r=>`<span class="role-badge">${r}</span>`).join('')}
+        </div>
+      </div>
+      <div class="step-body" style="display:block;">${buildMvlEditHtml(s)}</div>
+    </div>
+  `;
+}
+
+function wireDraftMvlCard(ev){
+  const card = document.getElementById('draftMvlCard');
+  if(!card) return;
+
+  card.querySelector('.edit-cancel').addEventListener('click', ()=>{
+    draftMvlStep = null;
+    draftMvlEv = null;
+    renderRight();
+  });
+
+  card.querySelector('.edit-save').addEventListener('click', ()=>{
+    const s = draftMvlStep;
+    s.form.datum = card.querySelector('.f-datum').value;
+    s.form.tijd = card.querySelector('.f-tijd').value;
+    s.form.vaartuigWerkplek = card.querySelector('.f-vaartuig-werkplek').value;
+    s.form.telefoonnummer = card.querySelector('.f-telefoonnummer').value;
+    s.form.toelichting = card.querySelector('.f-toelichting').value;
+    s.time = s.form.tijd;
+
+    const d = ev.detail;
+    const datum = s.form.datum;
+    if(d.timeline.length && d.timeline[0].date === datum){
+      d.timeline[0].steps.unshift(s);
+    } else {
+      d.timeline.unshift({date:datum, steps:[s]});
+    }
+
+    // Zichtbaar maken in het Waar-blokje van de infokaart, net als bij Incident.
+    if(typeof d.waar !== 'object'){
+      d.waar = { naam: d.waar, mvl: [] };
+    }
+    if(!Array.isArray(d.waar.mvl)) d.waar.mvl = [];
+    if(s.form.vaartuigWerkplek) d.waar.mvl.push(s.form.vaartuigWerkplek);
+
+    draftMvlStep = null;
+    draftMvlEv = null;
+
+    if(ev !== adhocSelection){
+      markEventChanged(ev);
+    }
+
+    renderRight();
+  });
+}
+
+/* ============ Locatie: doorzoekbaar veld met gecategoriseerde objecten ============ */
+/* ============ POPUP: Kaart (nadere locatie kiezen op een vaarweg) ============ */
+const MAP_SVG = `
+<svg viewBox="0 0 800 440" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="440" fill="#bfe0ef"/>
+  <polygon points="0,0 800,0 800,95 520,55 300,105 0,65" fill="#cdbd7e" opacity="0.9"/>
+  <polygon points="230,130 420,110 530,175 470,265 370,305 280,265 220,195" fill="#cdbd7e"/>
+  <polygon points="470,145 800,145 800,440 540,440 470,315" fill="#cdbd7e"/>
+  <path d="M 50 195 C 200 220, 300 260, 380 300 C 460 340, 520 385, 565 440 L 375 440 C 335 380, 255 320, 145 280 C 85 258, 50 235, 50 195 Z" fill="#7fa8cf" opacity="0.9"/>
+  <path d="M 0 55 C 150 88, 300 148, 420 158 C 560 170, 655 138, 800 85 L 800 178 C 650 218, 540 238, 420 218 C 300 198, 150 158, 0 138 Z" fill="#7fa8cf" opacity="0.85"/>
+  <polygon points="195,158 420,138 475,190 380,262 255,220" fill="none" stroke="#3f7fc4" stroke-width="2"/>
+  <path d="M 255 96 L 420 158 M 420 158 L 565 200 M 420 158 L 480 262" stroke="#e08a3c" stroke-width="1.5" fill="none"/>
+  <circle cx="150" cy="78" r="17" fill="#c9b97e"/>
+  <circle cx="645" cy="300" r="25" fill="#c9b97e"/>
+  <circle cx="705" cy="118" r="13" fill="#c9b97e"/>
+</svg>`;
+
+let mapZoomLevel = 1;
+
+function openLocationMapPopup(locatieLabel, specInputEl, existingSpecValue){
+  const existing = document.getElementById('mapPopupOverlay');
+  if(existing) existing.remove();
+  mapZoomLevel = 1;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'mapPopupOverlay';
+  overlay.innerHTML = `
+    <div class="modal-panel map-modal-panel">
+      <div class="map-header">Kaart</div>
+      <div class="map-canvas-wrap" id="mapCanvasWrap">
+        <div class="map-zoom-controls">
+          <div class="map-zoom-btn" id="mapZoomIn">+</div>
+          <div class="map-zoom-btn" id="mapZoomOut">&minus;</div>
+        </div>
+        <div class="map-canvas" id="mapCanvas">${MAP_SVG}</div>
+        <div class="map-pin" id="mapPin" style="left:50%;top:50%;">
+          <svg viewBox="0 0 24 24" fill="#ffffff" stroke="#1b1e26" stroke-width="1"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8z"/><circle cx="12" cy="10" r="2.4" fill="#1b1e26"/></svg>
+        </div>
+      </div>
+      <div class="map-spec-row">
+        <div class="flabel">Locatie specificatie</div>
+        <div class="loc-input-wrap">
+          <input type="text" id="mapNadereLocatieInput" placeholder="Typ nadere locatie..." value="${existingSpecValue||''}" autocomplete="off">
+          <svg class="loc-clear-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="#14161c" stroke-width="1.8"/></svg>
+        </div>
+      </div>
+      <div class="map-footer">
+        <div class="action-link" id="mapCancelBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/><line x1="15.5" y1="8.5" x2="8.5" y2="15.5"/></svg>
+          Annuleren
+        </div>
+        <div class="action-link" id="mapSelectBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+          Selecteren
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const wrapEl = document.getElementById('mapCanvasWrap');
+  const canvasEl = document.getElementById('mapCanvas');
+  const pinEl = document.getElementById('mapPin');
+  const nadereInput = document.getElementById('mapNadereLocatieInput');
+  const nadereInputWrap = nadereInput.closest('.loc-input-wrap');
+  const nadereClear = nadereInputWrap.querySelector('.loc-clear-icon');
+
+  const syncClear = ()=> nadereInputWrap.classList.toggle('has-value', !!nadereInput.value);
+  syncClear();
+  nadereInput.addEventListener('input', syncClear);
+  nadereClear.addEventListener('mousedown', (e)=>{
+    e.preventDefault();
+    nadereInput.value = '';
+    syncClear();
+    nadereInput.focus();
+  });
+
+  function movePinTo(xPct, yPct){
+    pinEl.style.left = xPct + '%';
+    pinEl.style.top = yPct + '%';
+  }
+
+  wrapEl.addEventListener('click', (e)=>{
+    if(e.target.closest('.map-zoom-btn')) return;
+    const rect = wrapEl.getBoundingClientRect();
+    const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+    const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+    movePinTo(xPct, yPct);
+    nadereInput.focus();
+  });
+
+  document.getElementById('mapZoomIn').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    mapZoomLevel = Math.min(2.5, mapZoomLevel + 0.25);
+    canvasEl.style.transform = `scale(${mapZoomLevel})`;
+  });
+  document.getElementById('mapZoomOut').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    mapZoomLevel = Math.max(0.7, mapZoomLevel - 0.25);
+    canvasEl.style.transform = `scale(${mapZoomLevel})`;
+  });
+
+  const close = ()=> overlay.remove();
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) close(); });
+  document.getElementById('mapCancelBtn').addEventListener('click', close);
+  document.getElementById('mapSelectBtn').addEventListener('click', ()=>{
+    if(specInputEl){
+      specInputEl.value = nadereInput.value || locatieLabel;
+    }
+    close();
+  });
+  document.addEventListener('keydown', function escHandler(e){
+    if(e.key === 'Escape'){ close(); document.removeEventListener('keydown', escHandler); }
+  });
+}
+
+const LOCATION_GROUPS = [
+  {cat:'Sluis', items:[
+    {label:'Algerasluis'},
+    {label:'Biesboschsluis'},
+    {label:'Stevinsluis - Gehele object'},
+    {label:'Stevinsluis - Westsluis', indent:true},
+    {label:'Stevinsluis - Westsluit - Deelkolk Noord', indent:true},
+  ]},
+  {cat:'Beweegbare brug', items:[
+    {label:'Algerabrug'},
+    {label:'Biesterbrug'},
+  ]},
+  {cat:'Vaste brug', items:[
+    {label:'Biesterbrug'},
+  ]},
+  {cat:'Bediencentrale', items:[
+    {label:'Centrale Terneuzen'},
+    {label:'Post Wemeldinge'},
+  ]},
+  {cat:'Verkeerspost', items:[
+    {label:'Verkeerscentrale Brandaris'},
+  ]},
+  {cat:'Wachthaven', items:[
+    {label:'3de Merwedehaven'},
+  ]},
+  {cat:'Watermanagementobjecten', items:[
+    {label:'Kiltunnel'},
+    {label:'Stuw Amerongen'},
+  ]},
+  {cat:'Vaarweg', items:[
+    {label:'Rosandepolder'},
+    {label:'Amsterdam-Rijnkanaal'},
+    {label:'Merwedekanaal (benoorden de Lek)'},
+  ]},
+];
+
+function buildLocationDropdownHtml(filter){
+  const f = (filter||'').toLowerCase().trim();
+  const groupsHtml = LOCATION_GROUPS.map(g=>{
+    const items = g.items.filter(it => !f || it.label.toLowerCase().includes(f));
+    if(!items.length) return '';
+    return `
+      <div class="loc-group-label">${g.cat}</div>
+      ${items.map(it=>`<div class="loc-item ${it.indent?'indent':''}" data-value="${it.label}" data-cat="${g.cat}">${it.label}</div>`).join('')}
+    `;
+  }).join('');
+  return groupsHtml || `<div class="loc-empty">Geen resultaten</div>`;
+}
+
+function wireLocationDropdown(scopeEl, stepData){
+  scopeEl.querySelectorAll('.loc-search-input').forEach(input=>{
+    const wrap = input.closest('.loc-field-wrap');
+    const dropdown = wrap ? wrap.querySelector('.loc-dropdown') : null;
+    const inputWrap = wrap ? wrap.querySelector('.loc-input-wrap') : null;
+    const clearIcon = wrap ? wrap.querySelector('.loc-clear-icon') : null;
+    if(!dropdown) return;
+
+    const syncClearIcon = ()=>{
+      if(inputWrap) inputWrap.classList.toggle('has-value', !!input.value);
+    };
+    syncClearIcon();
+
+    const refresh = ()=>{
+      dropdown.innerHTML = buildLocationDropdownHtml(input.value);
+      dropdown.querySelectorAll('.loc-item').forEach(item=>{
+        item.addEventListener('mousedown', (e)=>{
+          // mousedown (i.p.v. click) zodat dit vóór de blur van het inputveld vuurt
+          e.preventDefault();
+          input.value = item.dataset.value;
+          dropdown.classList.remove('open');
+          syncClearIcon();
+          const mapBtn = wrap.parentElement ? wrap.parentElement.querySelector('.loc-map-btn') : null;
+          const specInput = wrap.parentElement ? wrap.parentElement.querySelector('.f-locatie-spec') : null;
+          const isVaarweg = item.dataset.cat === 'Vaarweg';
+          if(stepData) stepData.form.locatieIsVaarweg = isVaarweg;
+          if(mapBtn) mapBtn.style.display = isVaarweg ? 'flex' : 'none';
+          if(isVaarweg){
+            openLocationMapPopup(item.dataset.value, specInput, specInput ? specInput.value : '');
+          }
+        });
+      });
+    };
+
+    input.addEventListener('focus', ()=>{ refresh(); dropdown.classList.add('open'); });
+    input.addEventListener('input', ()=>{ refresh(); dropdown.classList.add('open'); syncClearIcon(); });
+    input.addEventListener('blur', ()=>{ dropdown.classList.remove('open'); });
+
+    if(clearIcon){
+      clearIcon.addEventListener('mousedown', (e)=>{
+        e.preventDefault();
+        input.value = '';
+        syncClearIcon();
+        refresh();
+        input.focus();
+      });
+    }
+  });
+}
+
+/* ============ Naam vaartuig: doorzoekbare vaartuiglijst (bij Beroepsvaart) ============ */
+const VESSEL_ICONS = {
+  ship: `<svg viewBox="0 0 24 24" fill="none" stroke="#5d8bf0" stroke-width="1.8"><path d="M3 15l1.5 4.5a2 2 0 001.9 1.5h11.2a2 2 0 001.9-1.5L21 15"/><path d="M5 15l1-7h12l1 7"/><path d="M12 8V3"/><path d="M9 5h6"/></svg>`,
+  sail: `<svg viewBox="0 0 24 24" fill="none" stroke="#eecf4a" stroke-width="1.8"><path d="M12 3v16"/><path d="M12 4l6 11H12V4z"/><path d="M12 8L6 16h6V8z" opacity=".5"/><path d="M4 20h16"/></svg>`,
+};
+
+const VESSEL_LIST = [
+  {name:'INDUSTRIAL KATHARINA', type:'1500 - VRACHTSCHIP (ZEE)', mmsi:'305246000', eni:'-', imo:'9435129', callsign:'V2DK9', icon:'ship'},
+  {name:'AA KANT', type:'8460 - WERKVAARTUIG (BINV)', mmsi:'244010134', eni:'02335661', imo:'-', callsign:'PH5796', icon:'sail'},
+  {name:'ABAKAN', type:'8000 - VAARTUIG, TYPE ONBEKEND', mmsi:'-', eni:'-', imo:'8711277', callsign:'UISD', icon:'ship'},
+  {name:'ACKA I', type:'8000 - VAARTUIG, TYPE ONBEKEND', mmsi:'-', eni:'-', imo:'8926913', callsign:'3EIH9', icon:'ship'},
+  {name:'AFRIKA 2799', type:'8110 - SLEEP-VRACHTSCHIP', mmsi:'-', eni:'02003210', imo:'-', callsign:'-', icon:'sail'},
+  {name:'AGIA EKATERINI', type:'1520 - BULKCARRIER (ZEE)', mmsi:'538009463', eni:'-', imo:'9561904', callsign:'V7A4776', icon:'ship'},
+];
+
+function buildVesselDropdownHtml(filter){
+  const f = (filter||'').toLowerCase().trim();
+  const results = VESSEL_LIST.filter(v =>
+    !f ||
+    v.name.toLowerCase().includes(f) ||
+    v.mmsi.includes(f) || v.eni.includes(f) || v.imo.includes(f) || v.callsign.toLowerCase().includes(f)
+  );
+  if(!results.length) return `<div class="loc-empty">Geen resultaten</div>`;
+  return results.map(v => `
+    <div class="vessel-item" data-value="${v.name}">
+      <div class="v-icon">${VESSEL_ICONS[v.icon]}</div>
+      <div class="v-main">
+        <div class="v-name">${v.name}</div>
+        <div class="v-type">${v.type}</div>
+      </div>
+      <div class="v-stats">
+        <span>ENI: <b>${v.eni}</b></span>
+        <span>IMO: <b>${v.imo}</b></span>
+        <span>MMSI: <b>${v.mmsi}</b></span>
+        <span>CALLSIGN: <b>${v.callsign}</b></span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function wireVesselDropdown(scopeEl){
+  scopeEl.querySelectorAll('.vessel-search-input').forEach(input=>{
+    const wrap = input.closest('.loc-field-wrap');
+    const dropdown = wrap ? wrap.querySelector('.vessel-dropdown') : null;
+    const inputWrap = wrap ? wrap.querySelector('.loc-input-wrap') : null;
+    const clearIcon = wrap ? wrap.querySelector('.loc-clear-icon') : null;
+    if(!dropdown) return;
+
+    const syncClearIcon = ()=>{
+      if(inputWrap) inputWrap.classList.toggle('has-value', !!input.value);
+    };
+    syncClearIcon();
+
+    const refresh = ()=>{
+      dropdown.innerHTML = buildVesselDropdownHtml(input.value);
+      dropdown.querySelectorAll('.vessel-item').forEach(item=>{
+        item.addEventListener('mousedown', (e)=>{
+          e.preventDefault();
+          input.value = item.dataset.value;
+          dropdown.classList.remove('open');
+          syncClearIcon();
+        });
+      });
+    };
+
+    input.addEventListener('focus', ()=>{ refresh(); dropdown.classList.add('open'); });
+    input.addEventListener('input', ()=>{ refresh(); dropdown.classList.add('open'); syncClearIcon(); });
+    input.addEventListener('blur', ()=>{ dropdown.classList.remove('open'); });
+
+    if(clearIcon){
+      clearIcon.addEventListener('mousedown', (e)=>{
+        e.preventDefault();
+        input.value = '';
+        syncClearIcon();
+        refresh();
+        input.focus();
+      });
+    }
+  });
+}
+
+function setStepEditMode(card, editing){
+  const s = card._stepData;
+  const bodyEl = card.querySelector('.step-body');
+  if(!s || !bodyEl) return;
+  card.classList.toggle('editing', editing);
+  if(editing){
+    const formType = s.form.type;
+    if(formType === 'watermanagement'){
+      bodyEl.innerHTML = buildWatermanagementEditHtml(s);
+    } else if(formType === 'melding'){
+      bodyEl.innerHTML = buildMeldingEditHtml(s);
+    } else if(formType === 'opmerking'){
+      bodyEl.innerHTML = buildOpmerkingEditHtml(s);
+    } else if(formType === 'mvl'){
+      bodyEl.innerHTML = buildMvlEditHtml(s);
+    } else {
+      bodyEl.innerHTML = buildOvertredingEditHtml(s);
+    }
+
+    if(formType === 'overtreding' || formType === 'watermanagement'){
+      wireLocationDropdown(bodyEl, s);
+      // "Naar kaart" knop: alleen zichtbaar/relevant als de gekozen locatie een vaarweg is
+      const mapBtn = bodyEl.querySelector('.loc-map-btn');
+      if(mapBtn){
+        mapBtn.addEventListener('click', ()=>{
+          const specInput = bodyEl.querySelector('.f-locatie-spec');
+          const locatieInput = bodyEl.querySelector('.f-locatie');
+          openLocationMapPopup(locatieInput.value, specInput, specInput ? specInput.value : '');
+        });
+      }
+    }
+
+    if(formType === 'overtreding'){
+      wireVesselDropdown(bodyEl);
+      // Beroepsvaart -> doorzoekbare vaartuiglijst, Recreatievaart -> tekstveld
+      const beroepsWrap = bodyEl.querySelector('.vessel-field-beroeps');
+      const recreatieWrap = bodyEl.querySelector('.vessel-field-recreatie');
+      bodyEl.querySelectorAll('.f-vaarttype').forEach(radio=>{
+        radio.addEventListener('change', ()=>{
+          if(radio.checked){
+            beroepsWrap.style.display = radio.value === 'Beroepsvaart' ? 'block' : 'none';
+            recreatieWrap.style.display = radio.value === 'Recreatievaart' ? 'block' : 'none';
+          }
+        });
+      });
+    }
+
+    bodyEl.querySelector('.edit-cancel').addEventListener('click', ()=> setStepEditMode(card, false));
+    bodyEl.querySelector('.edit-save').addEventListener('click', ()=>{
+      // Prototype: velden overnemen in het geheugen-model (geen backend)
+      s.form.datum = bodyEl.querySelector('.f-datum').value;
+      s.form.tijd = bodyEl.querySelector('.f-tijd').value;
+      s.time = s.form.tijd;
+
+      if(formType === 'watermanagement'){
+        s.form.toelichting = bodyEl.querySelector('.f-toelichting').value;
+        s.form.locatie = bodyEl.querySelector('.f-locatie').value;
+        s.form.locatieSpecificatie = bodyEl.querySelector('.f-locatie-spec').value;
+        s.form.activiteit = bodyEl.querySelector('.f-activiteit').value;
+        s.detail = s.form.activiteit;
+      } else if(formType === 'melding'){
+        s.form.toelichting = bodyEl.querySelector('.f-toelichting').value;
+        s.form.soort = bodyEl.querySelector('.f-soort').value;
+        s.detail = s.form.soort;
+      } else if(formType === 'opmerking'){
+        s.form.titel = bodyEl.querySelector('.f-titel').value;
+        s.form.opmerking = bodyEl.querySelector('.f-opmerking').value;
+        s.name = s.form.titel ? `Opmerking - ${s.form.titel}` : 'Opmerking';
+        s.detail = s.form.opmerking.slice(0, 60) + (s.form.opmerking.length > 60 ? '…' : '');
+      } else if(formType === 'mvl'){
+        s.form.vaartuigWerkplek = bodyEl.querySelector('.f-vaartuig-werkplek').value;
+        s.form.telefoonnummer = bodyEl.querySelector('.f-telefoonnummer').value;
+        s.form.toelichting = bodyEl.querySelector('.f-toelichting').value;
+      } else {
+        s.form.toelichting = bodyEl.querySelector('.f-toelichting').value;
+        s.form.locatie = bodyEl.querySelector('.f-locatie').value;
+        s.form.locatieSpecificatie = bodyEl.querySelector('.f-locatie-spec').value;
+        const vt = bodyEl.querySelector('.f-vaarttype:checked');
+        if(vt) s.form.vaarttype = vt.value;
+        s.form.varendeEenheid = (s.form.vaarttype === 'Recreatievaart')
+          ? bodyEl.querySelector('.f-eenheid-recreatie').value
+          : bodyEl.querySelector('.vessel-search-input').value;
+        s.form.reden = bodyEl.querySelector('.f-reden').value;
+        s.form.waarschuwingGegeven = bodyEl.querySelector('.f-waarschuwing').checked;
+        s.form.opvolgingNodig = bodyEl.querySelector('.f-opvolging').checked;
+        s.detail = s.form.reden;
+      }
+
+      setStepEditMode(card, false);
+      refreshCompactHeaderInPlace();
+
+      // Alleen een status-overgang naar "In behandeling" bij een hernieuwde
+      // bewerking - niet tijdens het allereerst aanmaken (dat blijft Aangemeld).
+      const currentEv = getCurrentEv();
+      if(currentEv && currentEv !== adhocSelection){
+        markEventChanged(currentEv);
+      }
+    });
+  } else {
+    bodyEl.innerHTML = buildStepBodyHtml(s);
+    wireStepBodyLinks(card);
+    // koptekst (tijd/naam/detail) van het kaartje bijwerken na eventuele wijziging
+    const timeEl = card.querySelector('.step-time');
+    const nameEl = card.querySelector('.step-name');
+    const detailEl = card.querySelector('.step-detail');
+    if(timeEl) timeEl.textContent = s.time;
+    if(nameEl) nameEl.textContent = s.name;
+    if(detailEl) detailEl.textContent = s.detail || '';
+  }
+}
+
+function wireStepBodyLinks(card){
+  const wijzigenLink = card.querySelector('.wijzigen-link');
+  if(wijzigenLink){
+    wijzigenLink.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if(card._stepData && card._stepData.form && card._stepData.form.editable){
+        setStepEditMode(card, true);
+      } else {
+        alert('Nog niet beschikbaar in prototype');
+      }
+    });
+  }
+}
+
+function buildFooterTabsHtml(s){
+  const n = s.num ? parseInt(s.num, 10) : 0;
+  const tabs = ['Origineel'];
+  for(let i=1;i<=n;i++) tabs.push(String(i));
+  const activeIdx = tabs.length - 1; // laatste (huidige) versie is standaard actief
+  return tabs.map((t,i)=>`<div class="footer-tab ${i===activeIdx?'active':''}" data-tab-idx="${i}">${t}</div>`).join('');
+}
+
+function buildStepBodyHtml(s){
+  if(s.form && s.form.type === 'overtreding'){
+    return buildOvertredingReadHtml(s);
+  }
+  if(s.form && s.form.type === 'watermanagement'){
+    return buildWatermanagementReadHtml(s);
+  }
+  if(s.form && s.form.type === 'melding'){
+    return buildMeldingReadHtml(s);
+  }
+  if(s.form && s.form.type === 'opmerking'){
+    return buildOpmerkingReadHtml(s);
+  }
+  if(s.form && s.form.type === 'mvl'){
+    return buildMvlReadHtml(s);
+  }
+  if(s.form && s.form.type === 'fields'){
+    const f = s.form;
+    const colsHtml = f.columns.map(col=>{
+      if(col.length === 2 && col[0].inline && col[1].inline){
+        return `
+          <div class="form-fields-col">
+            <div class="form-row-inline">
+              <div class="form-field">
+                <div class="flabel">${col[0].label}</div>
+                <div class="fval">${col[0].value}</div>
+              </div>
+              <div class="form-field">
+                <div class="flabel">${col[1].label}</div>
+                <div class="fval">${col[1].value}</div>
+              </div>
+            </div>
+          </div>`;
+      }
+      return `
+        <div class="form-fields-col">
+          ${col.map(fld=>`
+            <div class="form-field">
+              <div class="flabel">${fld.label}</div>
+              <div class="fval">${fld.value || '&nbsp;'}</div>
+            </div>
+          `).join('')}
+        </div>`;
+    }).join('');
+    return `
+      <div class="form-fields-grid">${colsHtml}</div>
+      <div class="step-footer">
+        <div class="footer-tabs">${buildFooterTabsHtml(s)}</div>
+        <div class="footer-actions">
+          <a>&#9998; Wijzigen</a>
+        </div>
+      </div>
+    `;
+  }
+  if(s.form){
+    const f = s.form;
+    return `
+      <div class="form-grid">
+        <div>
+          <div class="form-row-inline">
+            <div class="form-field">
+              <div class="flabel">Gebeurtenis*</div>
+              <div class="fval">${f.gebeurtenis}</div>
+            </div>
+          </div>
+          <div class="form-row-inline">
+            <div class="form-field">
+              <div class="flabel">Datum*</div>
+              <div class="fval">${f.datum}</div>
+            </div>
+            <div class="form-field">
+              <div class="flabel">Tijd*</div>
+              <div class="fval">${f.tijd}</div>
+            </div>
+          </div>
+          <div class="form-section-title" style="margin-top:10px;">${f.section}</div>
+          <div class="form-field">
+            <div class="flabel">${f.primaryLabel}</div>
+            <div class="fval fval-with-icon">
+              <span>${f.primaryValue}</span>
+              ${f.showIcon ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e8b73d" stroke-width="1.8"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></svg>' : ''}
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="form-field">
+            <div class="flabel">${f.secondaryLabel}</div>
+            <div class="fval empty">${f.secondaryValue || '&nbsp;'}</div>
+          </div>
+        </div>
+      </div>
+      <div class="step-footer">
+        <div class="footer-tabs">${buildFooterTabsHtml(s)}</div>
+        <div class="footer-actions">
+          <span class="lab">Direct naar:</span>
+          <a>Wie</a>
+          <a>Wat</a>
+          <a>&#9998; Wijzigen</a>
+        </div>
+      </div>
+    `;
+  }
+  return `
+    <div class="generic-detail">
+      <div class="row"><span class="k">Gebeurtenis</span><span class="v">${s.name}</span></div>
+      <div class="row"><span class="k">Waarde</span><span class="v">${s.detail || '-'}</span></div>
+      <div class="row"><span class="k">Geregistreerd door</span><span class="v">${s.roles.join(', ')}</span></div>
+    </div>
+    <div class="step-footer">
+      <div class="footer-tabs">${buildFooterTabsHtml(s)}</div>
+      <div class="footer-actions">
+        <a>&#9998; Wijzigen</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderStep(s, key){
+  const rolesHtml = s.roles.map(r=>`<span class="role-badge">${r}</span>`).join('');
+  const numHtml = s.num ? `<div class="step-num">${s.num}</div>` : `<div class="step-num" style="visibility:hidden;"></div>`;
+  const bodyHtml = buildStepBodyHtml(s);
+
+  return `
+    <div class="step-card" data-key="${key}">
+      <div class="step-head">
+        <div class="step-time">${s.time}</div>
+        ${numHtml}
+        <div class="step-name">${s.name}</div>
+        <div class="step-detail">${s.detail || ''}</div>
+        <div class="step-right">
+          ${rolesHtml}
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="step-body">${bodyHtml}</div>
+    </div>
+  `;
+}
+
+/* ============ POPUP: protocol/status stap details ============ */
+function openStepModal(label, step){
+  const existing = document.getElementById('stepModalOverlay');
+  if(existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'stepModalOverlay';
+  overlay.innerHTML = `
+    <div class="modal-panel">
+      <svg class="modal-close" id="modalCloseBtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+      <div class="modal-title">${step.name || label}</div>
+      <div class="modal-sub">${step.time || ''} ${step.detail ? '&middot; ' + step.detail : ''}</div>
+      ${buildStepBodyHtml(step)}
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = ()=> overlay.remove();
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) close(); });
+  document.getElementById('modalCloseBtn').addEventListener('click', close);
+  document.addEventListener('keydown', function escHandler(e){
+    if(e.key === 'Escape'){ close(); document.removeEventListener('keydown', escHandler); }
+  });
+}
+
+/* ============ POPUP: Protocol - volledig overzicht ============ */
+
+// Volgorde van het protocol volgt exact de Melding- en Registratie-blokken
+// uit het Vervolgmenu (zelfde bron, dus altijd synchroon).
+const PROTOCOL_LABELS = [
+  ...VERVOLG_MENU.find(s=>s.section==='Melding').items,
+  ...VERVOLG_MENU.find(s=>s.section==='Registratie voor scheepsongeval').items,
+].map(it => typeof it === 'string' ? it : it.label);
+
+// Koppeling tussen protocol-item en de naam van de bijbehorende processtap
+// in de tijdlijn. Items zonder koppeling zijn nooit "af" (altijd TO DO) in
+// dit prototype, omdat er nog geen kaartje-type voor bestaat.
+const PROTOCOL_STEP_NAME_MAP = {
+  'Waar':'Constatering incident - Waar',
+  'Wie':'Constatering incident - Wie',
+  'Wat':'Constatering incident - Wat',
+  'Aard ongeval':'Aard ongeval',
+};
+
+function protocolDisplayLabel(label){
+  return ['Waar','Wie','Wat'].includes(label) ? ('Constatering ' + label) : label;
+}
+
+function findProtocolStep(detail, label){
+  const stepName = PROTOCOL_STEP_NAME_MAP[label];
+  if(!stepName) return null;
+  for(const group of detail.timeline){
+    for(const s of group.steps){
+      if(s.name === stepName) return {...s, date:group.date};
+    }
+  }
+  return null;
+}
+
+function buildProtocolRows(detail){
+  return PROTOCOL_LABELS.map(label=>{
+    const found = findProtocolStep(detail, label);
+    return {
+      label,
+      display: protocolDisplayLabel(label),
+      done: !!found,
+      dateTime: found ? `${found.date} ${found.time}` : null,
+      step: found,
+    };
+  });
+}
+
+function openProtocolModal(detail){
+  const existing = document.getElementById('protocolModalOverlay');
+  if(existing) existing.remove();
+
+  const rows = buildProtocolRows(detail);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'protocolModalOverlay';
+  overlay.innerHTML = `
+    <div class="modal-panel protocol-modal-panel">
+      <div class="protocol-modal-header">
+        <div class="protocol-modal-title">Protocol - volledig overzicht</div>
+        <svg class="modal-close-x" id="protocolModalClose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+      </div>
+      <div class="protocol-rows">
+        ${rows.map((r,i)=>`
+          <div class="protocol-row" data-idx="${i}">
+            <span class="lab">${r.display}</span>
+            <span class="val ${r.done?'':'todo'}">${r.done ? r.dateTime : 'TO DO'}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = ()=> overlay.remove();
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) close(); });
+  document.getElementById('protocolModalClose').addEventListener('click', close);
+  overlay.querySelectorAll('.protocol-row').forEach((rowEl, i)=>{
+    rowEl.addEventListener('click', ()=>{
+      const r = rows[i];
+      if(r.step){
+        close();
+        openStepModal(r.display, r.step);
+      } else {
+        alert('Nog niet beschikbaar in prototype');
+      }
+    });
+  });
+  document.addEventListener('keydown', function escHandler(e){
+    if(e.key === 'Escape'){ close(); document.removeEventListener('keydown', escHandler); }
+  });
+}
+
+/* ============ VERSIE-TABBLADEN (Origineel / 1 / 2 / ...) ============ */
+document.addEventListener('click', (e)=>{
+  const tab = e.target.closest('.footer-tab');
+  if(!tab) return;
+  e.stopPropagation();
+  const container = tab.closest('.footer-tabs');
+  if(!container) return;
+  container.querySelectorAll('.footer-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+});
+
+/* ============ TABS / TOGGLE / NIEUW ============ */
+document.querySelectorAll('.list-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.list-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    currentTab = tab.dataset.tab;
+    renderList();
+    renderRight();
+  });
+});
+
+document.getElementById('toggleSwitch').addEventListener('click', function(){
+  this.classList.toggle('off');
+});
+
+/* ============ POPUP: Nieuwe gebeurtenis ============ */
+const NEW_EVENT_ICONS = {
+  stremming: `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="6" y1="18" x2="18" y2="6"/></svg>`,
+  beperking: `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v18"/><path d="M5 8l-3 6a4 4 0 007 0l-3-6"/><path d="M19 8l-3 6a4 4 0 007 0l-3-6"/><path d="M4 8h16"/><path d="M9 21h6"/></svg>`,
+  gepland: `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="17" rx="1.5"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/><path d="M8 14l2.5 2.5L16 11"/></svg>`,
+  storing: `<svg class="ic" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>`,
+  incident: `<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/><line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/></g></svg>`,
+  overtreding: `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 L23 21 L1 21 Z" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="14.5" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1" fill="currentColor" stroke="none"/></svg>`,
+  watermanagement: `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/></svg>`,
+  melding: `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="1.5"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg>`,
+};
+
+const NEW_EVENT_COLUMNS = [
+  {
+    title:'Stremming/beperking',
+    groups:[
+      [
+        {label:'Stremming', icon:'stremming'},
+        {label:'Beperking', icon:'beperking'},
+      ],
+      [
+        {label:'Geplande stremming', icon:'gepland'},
+        {label:'Geplande beperking', icon:'gepland'},
+      ],
+    ]
+  },
+  {
+    title:'Overig',
+    groups:[
+      [
+        {label:'Storing', icon:'storing'},
+        {label:'Incident', icon:'incident'},
+        {label:'Overtreding', icon:'overtreding'},
+        {label:'Watermanagement', icon:'watermanagement'},
+        {label:'Melding', icon:'melding'},
+      ],
+    ]
+  },
+];
+
+function chevronSvg(){
+  return `<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 6 15 12 9 18"/></svg>`;
+}
+
+function openNewEventModal(){
+  const existing = document.getElementById('newEventModalOverlay');
+  if(existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'newEventModalOverlay';
+  overlay.innerHTML = `
+    <div class="modal-panel new-event-modal-panel">
+      <div class="new-event-header">Nieuwe gebeurtenis</div>
+      <div class="new-event-columns">
+        ${NEW_EVENT_COLUMNS.map(col => `
+          <div>
+            <div class="new-event-col-title">${col.title}</div>
+            ${col.groups.map((group, gi) => `
+              ${gi > 0 ? '<div class="new-event-divider"></div>' : ''}
+              ${group.map(item => `
+                <div class="new-event-item" data-label="${item.label}">
+                  ${NEW_EVENT_ICONS[item.icon]}
+                  <span class="lbl">${item.label}</span>
+                  ${chevronSvg()}
+                </div>
+              `).join('')}
+            `).join('')}
+          </div>
+        `).join('')}
+      </div>
+      <div class="new-event-footer">
+        <div class="new-event-cancel" id="newEventCancel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/><line x1="15.5" y1="8.5" x2="8.5" y2="15.5"/></svg>
+          ANNULEREN
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = ()=> overlay.remove();
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) close(); });
+  document.getElementById('newEventCancel').addEventListener('click', close);
+  overlay.querySelectorAll('.new-event-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      close();
+      const label = item.dataset.label;
+      if(label === 'Overtreding'){
+        openNewOvertreding();
+      } else if(label === 'Watermanagement'){
+        openNewWatermanagement();
+      } else if(label === 'Melding'){
+        openNewMelding();
+      } else {
+        alert('Nog niet beschikbaar in prototype');
+      }
+    });
+  });
+  document.addEventListener('keydown', function escHandler(e){
+    if(e.key === 'Escape'){ close(); document.removeEventListener('keydown', escHandler); }
+  });
+}
+
+document.getElementById('btnNieuw').addEventListener('click', ()=>{
+  openNewEventModal();
+});
+
+/* ============ Nieuwe Overtreding MF ============ */
+function pad2(n){ return String(n).padStart(2,'0'); }
+function randomCredential(){
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  return letters[Math.floor(Math.random()*26)] + letters[Math.floor(Math.random()*26)];
+}
+
+function buildFreshOvertreding(){
+  const now = new Date();
+  const datum = `${pad2(now.getDate())}-${pad2(now.getMonth()+1)}-${now.getFullYear()}`;
+  const tijd = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+  const naamVaartuig = 'Willem van Nassau';
+  const reden = 'Door rood licht varen';
+  const locatie = 'SLUIS WEURT - Westkolk';
+
+  return {
+    headerLine1: `${tijd} · Overtreding · ${naamVaartuig}`,
+    headerLine2: reden,
+    dossier: 'Dossier #000000 Nieuw',
+    protocol:[
+      ['Constatering', `${datum} ${tijd}`],
+      ['Status','Aangemeld'],
+      ['Looptijd (uu:mm)','00:00'],
+      ['Einde','-'],
+    ],
+    waar: locatie,
+    wie: { betrokkenen:[ {label:naamVaartuig, icons:['boat']} ], hulpverleners:[] },
+    timeline:[
+      {date:datum, steps:[
+        {
+          time:tijd, num:null, name:'Overtreding', detail:reden, roles:['RV', randomCredential()],
+          form:{
+            type:'overtreding',
+            editable:true,
+            gebeurtenis:'Overtreding geconstateerd',
+            datum, tijd,
+            vaarttype:'Beroepsvaart',
+            varendeEenheid:naamVaartuig,
+            reden,
+            locatie,
+            locatieSpecificatie:'',
+            locatieIsVaarweg:false,
+            waarschuwingGegeven:false,
+            opvolgingNodig:false,
+            toelichting:''
+          }
+        }
+      ]}
+    ]
+  };
+}
+
+// Bouwt de lijst-item data voor een net aangemaakte gebeurtenis, op basis van
+// de (mogelijk bewerkte) waarden in het opgeslagen formulier.
+function buildAdhocListEntry(ev){
+  const f = ev.detail.timeline[0].steps[0].form;
+  if(ev.type === 'overtreding'){
+    return {
+      id:'', type:'overtreding',
+      title:`Overtreding - ${f.varendeEenheid}`,
+      desc:`${f.reden} - geconstateerd op ${f.datum} ${f.tijd}`,
+      status:'aangemeld', statusLabel:'Aangemeld', badge:'-',
+      detail: ev.detail
+    };
+  }
+  if(ev.type === 'watermanagement'){
+    return {
+      id:'', type:'watermanagement',
+      title:`Watermanagement - ${f.locatie}`,
+      desc:`${f.activiteit} - geconstateerd op ${f.datum} ${f.tijd}`,
+      status:'aangemeld', statusLabel:'Aangemeld', badge:'-',
+      detail: ev.detail
+    };
+  }
+  if(ev.type === 'melding'){
+    return {
+      id:'', type:'melding',
+      title:`Melding - ${f.soort}`,
+      desc:`Geconstateerd op ${f.datum} ${f.tijd}`,
+      status:'aangemeld', statusLabel:'Aangemeld', badge:'-',
+      detail: ev.detail
+    };
+  }
+  return null;
+}
+
+// Pas bij het opslaan van de EERSTE processtap wordt de gloednieuwe
+// gebeurtenis echt aan de gebeurtenislijst toegevoegd.
+// Status-overgang: een nieuwe gebeurtenis is "Aangemeld" totdat er iets aan
+// gewijzigd wordt (extra processtap, hernieuwde bewerking) — dan pas
+// "In behandeling". Werkt niet meer als de gebeurtenis al is beëindigd.
+function markEventChanged(ev){
+  if(!ev || ev.status === 'behandeling' || ev.status === 'beeindigd') return;
+  ev.status = 'behandeling';
+  ev.statusLabel = 'In behandeling';
+  if(ev.detail && ev.detail.protocol){
+    const statusField = ev.detail.protocol.find(p=>p[0]==='Status');
+    if(statusField) statusField[1] = 'In behandeling';
+  }
+  renderList();
+  if(getCurrentEv() === ev) renderRight();
+}
+
+function commitAdhocEvent(ev){
+  const entry = buildAdhocListEntry(ev);
+  if(!entry) return;
+  events.unshift(entry);
+  if(adhocSelection === ev){
+    selectedIndex = 0;
+    adhocSelection = null;
+  }
+  renderList();
+  // Rechterpaneel opnieuw koppelen aan het nieuwe lijst-item (andere object-
+  // identiteit dan de tijdelijke adhocSelection), zodat knoppen als
+  // +Opmerking daarna weer correct werken.
+  renderRight();
+}
+
+// Wanneer de gebruiker de EERSTE (nog nooit opgeslagen) processtap
+// annuleert, vervalt de hele concept-gebeurtenis weer volledig.
+function discardAdhocEvent(ev){
+  if(adhocSelection === ev){
+    adhocSelection = null;
+    renderRight();
+  }
+}
+
+function wireFirstCardCommit(ev, firstCard){
+  const saveBtn = firstCard.querySelector('.edit-save');
+  const cancelBtn = firstCard.querySelector('.edit-cancel');
+  if(saveBtn) saveBtn.addEventListener('click', ()=> commitAdhocEvent(ev));
+  if(cancelBtn) cancelBtn.addEventListener('click', ()=> discardAdhocEvent(ev));
+}
+
+function openNewOvertreding(){
+  const detail = buildFreshOvertreding();
+  adhocSelection = { type:'overtreding', title:'Overtreding', detail };
+  infoCollapsed = false;
+  renderRight();
+
+  // Nieuw kaartje meteen open en in edit mode, klaar om in te vullen.
+  // Pas bij Opslaan verschijnt de gebeurtenis in de lijst; bij Annuleren
+  // vervalt hij weer volledig.
+  const firstCard = rightEl.querySelector('.step-card');
+  if(firstCard){
+    firstCard.classList.add('open');
+    setStepEditMode(firstCard, true);
+    wireFirstCardCommit(adhocSelection, firstCard);
+  }
+}
+
+function buildFreshWatermanagement(){
+  const now = new Date();
+  const datum = `${pad2(now.getDate())}-${pad2(now.getMonth()+1)}-${now.getFullYear()}`;
+  const tijd = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+  const activiteit = 'Pompen';
+  const locatie = 'Volkeraksluizen - MIDDENSLUIS';
+
+  return {
+    headerLine1: `${tijd} · Watermanagement · ${activiteit}`,
+    headerLine2: locatie,
+    dossier: 'Dossier #000000 Nieuw',
+    protocol:[
+      ['Constatering', `${datum} ${tijd}`],
+      ['Status','Aangemeld'],
+      ['Looptijd (uu:mm)','00:00'],
+      ['Einde','-'],
+    ],
+    waar: locatie,
+    wie: '-',
+    timeline:[
+      {date:datum, steps:[
+        {
+          time:tijd, num:null, name:'Watermanagement', detail:activiteit, roles:['RV', randomCredential()],
+          form:{
+            type:'watermanagement',
+            editable:true,
+            gebeurtenis:'Watermanagement geconstateerd',
+            datum, tijd,
+            activiteit,
+            locatie,
+            locatieSpecificatie:'',
+            locatieIsVaarweg:false,
+            toelichting:''
+          }
+        }
+      ]}
+    ]
+  };
+}
+
+function openNewWatermanagement(){
+  const detail = buildFreshWatermanagement();
+  adhocSelection = { type:'watermanagement', title:'Watermanagement', detail };
+  infoCollapsed = false;
+  renderRight();
+
+  const firstCard = rightEl.querySelector('.step-card');
+  if(firstCard){
+    firstCard.classList.add('open');
+    setStepEditMode(firstCard, true);
+    wireFirstCardCommit(adhocSelection, firstCard);
+  }
+}
+
+function buildFreshMelding(){
+  const now = new Date();
+  const datum = `${pad2(now.getDate())}-${pad2(now.getMonth()+1)}-${now.getFullYear()}`;
+  const tijd = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+  const soort = 'Sleuteluitgifte';
+
+  return {
+    headerLine1: `${tijd} · Melding`,
+    headerLine2: soort,
+    dossier: 'Dossier #000000 Nieuw',
+    protocol:[
+      ['Constatering', `${datum} ${tijd}`],
+      ['Status','Aangemeld'],
+      ['Looptijd (uu:mm)','00:00'],
+      ['Einde','-'],
+    ],
+    waar:'-',
+    wie:'-',
+    timeline:[
+      {date:datum, steps:[
+        {
+          time:tijd, num:null, name:'Melding', detail:soort, roles:['RV', randomCredential()],
+          form:{
+            type:'melding',
+            editable:true,
+            gebeurtenis:'Melding geconstateerd',
+            datum, tijd,
+            soort,
+            toelichting:''
+          }
+        }
+      ]}
+    ]
+  };
+}
+
+function openNewMelding(){
+  const detail = buildFreshMelding();
+  adhocSelection = { type:'melding', title:'Melding', detail };
+  infoCollapsed = false;
+  renderRight();
+
+  const firstCard = rightEl.querySelector('.step-card');
+  if(firstCard){
+    firstCard.classList.add('open');
+    setStepEditMode(firstCard, true);
+    wireFirstCardCommit(adhocSelection, firstCard);
+  }
+}
+
+// Sluit een Melding af via de Vervolg-opties "Sleutelinname" / "Persoon verlaat object".
+// Voegt een afsluitend kaartje toe, zet de status op Beëindigd en verplaatst de
+// gebeurtenis (weg uit Actueel) richting Historie.
+function endMelding(ev, actionLabel){
+  if(ev.status === 'beeindigd') return; // al beëindigd, niet nogmaals afsluiten
+
+  const now = new Date();
+  const datum = `${pad2(now.getDate())}-${pad2(now.getMonth()+1)}-${now.getFullYear()}`;
+  const d = ev.detail;
+
+  const closingStep = {
+    time:`${pad2(now.getHours())}:${pad2(now.getMinutes())}`, num:null, name:actionLabel, detail:'Gebeurtenis beëindigd', roles:['RV', randomCredential()]
+  };
+  // Nieuwste stap bovenaan: zelfde datum -> vooraan in de bestaande groep,
+  // andere datum -> nieuwe groep vooraan.
+  if(d.timeline.length && d.timeline[0].date === datum){
+    d.timeline[0].steps.unshift(closingStep);
+  } else {
+    d.timeline.unshift({date:datum, steps:[closingStep]});
+  }
+
+  const statusField = d.protocol.find(p=>p[0]==='Status');
+  if(statusField) statusField[1] = 'Beëindigd';
+  const eindeField = d.protocol.find(p=>p[0]==='Einde');
+  if(eindeField) eindeField[1] = `${datum} ${closingStep.time}`;
+
+  ev.status = 'beeindigd';
+  ev.statusLabel = 'Beëindigd';
+
+  // Uit Actueel halen en naar Historie verplaatsen (nieuwste bovenaan)
+  const idx = events.indexOf(ev);
+  if(idx > -1) events.splice(idx, 1);
+  historyEvents.unshift(ev);
+  historySelectedIndex = 0;
+
+  selectedIndex = 0;
+  adhocSelection = null;
+  renderList();
+  renderRight();
+}
+
+/* ============ LIST COLLAPSE / EXPAND ============ */
+const leftPanelWrap = document.getElementById('leftPanelWrap');
+const collapseRail = document.getElementById('collapseRail');
+
+function setListCollapsed(collapsed){
+  listCollapsed = collapsed;
+  leftPanelWrap.classList.toggle('collapsed', collapsed);
+}
+
+collapseRail.addEventListener('click', ()=>{
+  setListCollapsed(!listCollapsed);
+});
+
+/* ============ RESPONSIVE: auto-collapse op tablet-formaat of kleiner ============ */
+function applyResponsiveCollapse(){
+  const isNarrow = window.innerWidth <= TABLET_MAX;
+  // Alleen automatisch dichtklappen op het moment dat het scherm van breed
+  // naar smal gaat. Handmatig weer uitklappen door de gebruiker blijft
+  // daarna mogelijk, ook al blijft het scherm smal.
+  if(isNarrow && !wasNarrow){
+    setListCollapsed(true);
+    setInfoCollapsed(true);
+  }
+  wasNarrow = isNarrow;
+}
+
+// initiële staat bij page load
+if(window.innerWidth <= TABLET_MAX){
+  listCollapsed = true;
+  infoCollapsed = true;
+}
+
+let resizeTimer;
+window.addEventListener('resize', ()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(applyResponsiveCollapse, 120);
+});
+
+/* ============ CLOCK ============ */
+function updateClock(){
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2,'0');
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const yyyy = now.getFullYear();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const min = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('navDateTime').textContent = `${dd}-${mm}-${yyyy} ${hh}:${min}`;
+}
+updateClock();
+setInterval(updateClock, 30000);
+
+/* ============ INIT ============ */
+if(listCollapsed){ leftPanelWrap.classList.add('collapsed'); }
+renderList();
+renderRight();
+</script>
+</body>
+</html>
