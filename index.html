@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-16: flyer VvE e-learning, eigen standaardvoorbeeld per app -->
+<!-- fix-17: MyPhoto bijgewerkt met de Foto App op de telefoon -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -250,9 +250,9 @@ const P = [
     desc:"Houd je verzameling cd's en platen bij. Scan de barcode, en artiest, titel en jaar worden automatisch opgezocht via MusicBrainz en Discogs.",
     tags:["Firebase","PWA"],
     shots:{ dir:"muziekapp", captions:["Alle albums met een A-tot-Z-index","Album met tracklijst en uitgaven","Album toevoegen met de barcodescanner","Beheer: streamingdienst, import en opberglocaties"] } },
-  { cat:"thuis", name:"MyPhoto", status:"lokaal",
-    desc:"Fotobeheer voor een bibliotheek van ruim 48.000 foto's. Maak albums, tag, draai en verbeter foto's, spoor dubbele foto's op en zet gekozen albums in Google Drive. Met een beveiligde albumviewer om je foto's op de telefoon te bekijken.",
-    tags:["Python","Flask","SQLite","Google Drive"], nolink:"Draait lokaal op de laptop" },
+  { cat:"thuis", name:"MyPhoto", repo:"FotoOpruimen", label:"Open Foto App", status:"live",
+    desc:"Fotobeheer voor een archief van zo'n 50.000 foto's, in twee delen. Op de laptop orden je albums, tag, draai en verbeter je foto's en spoor je dubbele foto's op. Met de Foto App op je telefoon bekijk je je foto's per jaar of album, ook als diavoorstelling op de tv via Chromecast, en ruim je op: markeer foto's als weg of houden en verplaats ze tussen albums. Er wordt nooit iets automatisch verwijderd; op de laptop controleer je eerst de lijst. Inloggen met Google, alleen voor eigen gebruik.",
+    tags:["Python","Flask","SQLite","Google Drive","Chromecast"] },
   { cat:"thuis", name:"Mijn Zaken", repo:"mypersonal", url:"https://raw.githack.com/bruindav/mypersonal/b91d3f99e8dff746f62b3dd04938da06e2082ab5/index.html", label:"Open testversie", status:"proto",
     desc:"Beveiligde kluis voor belangrijke gegevens die een ander nodig heeft als ik het zelf niet meer kan vertellen, zoals adressen en bankzaken.",
     tags:["Firebase","Versleuteld"] },
