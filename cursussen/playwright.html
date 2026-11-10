@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cursus Playwright</title>
+<meta name="description" content="Cursus in acht modules om testautomatisering met Playwright en TypeScript te leren, met oefeningen op echte webapps.">
+<link rel="icon" type="image/png" href="../favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#f6f3ec; --surface:#fffdf8; --ink:#14213a; --muted:#5b6478; --line:#e2dccd;
+  --accent:#b8740f; --accent-ink:#ffffff; --navy:#1b2b4b; --chip:#ece6d8; --code:#1b2b4b; --code-ink:#e9eef8;
+  --display:"IBM Plex Serif",Georgia,serif; --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1729; --surface:#16213a; --ink:#ece7dc; --muted:#a3abbd; --line:#26324f;
+  --accent:#e9a63a; --accent-ink:#1a1206; --navy:#c9d3ea; --chip:#1f2b47; --code:#0a1120; --code-ink:#dfe6f3; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1729; --surface:#16213a; --ink:#ece7dc; --muted:#a3abbd; --line:#26324f;
+  --accent:#e9a63a; --accent-ink:#1a1206; --navy:#c9d3ea; --chip:#1f2b47; --code:#0a1120; --code-ink:#dfe6f3; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 16px 72px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px}
+header.top{grid-column:1/-1;display:grid;gap:10px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--navy);text-decoration:none;font-weight:500;width:max-content}
+.brand img{width:30px;height:30px}
+.back{font-size:14px;color:var(--muted)}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(30px,5vw,44px);line-height:1.15;margin:6px 0 0;color:var(--navy)}
+.lead{margin:0;color:var(--muted);max-width:62ch}
+nav.toc{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:14px}
+nav.toc strong{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+nav.toc a{display:block;padding:6px 10px;border-radius:8px;color:var(--ink);text-decoration:none;border-left:2px solid transparent}
+nav.toc a:hover{background:var(--chip)}
+nav.toc a.on{border-left-color:var(--accent);background:var(--surface);font-weight:500}
+main{min-width:0;max-width:760px}
+main h2{font-family:var(--display);font-weight:600;font-size:28px;line-height:1.25;color:var(--navy);margin:56px 0 12px;padding-top:24px;border-top:1px solid var(--line)}
+main h2:first-child{margin-top:0;padding-top:0;border-top:0}
+main h3{font-size:18px;font-weight:600;margin:32px 0 8px}
+main h3[id^="oefening"],main h3[id^="oefening"]+*{scroll-margin-top:16px}
+main a{color:var(--accent)}
+p,ul,ol,table,pre,blockquote{margin:0 0 16px}
+code{font-family:var(--mono);font-size:.88em;overflow-wrap:anywhere;background:var(--chip);padding:.1em .35em;border-radius:5px}
+pre{position:relative;background:var(--code);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:14px;line-height:1.55}
+pre code{background:none;padding:0;overflow-wrap:normal;font-size:inherit;color:inherit}
+pre[data-lang]::before{content:attr(data-lang);position:absolute;top:6px;right:62px;font:500 11px var(--mono);color:#8c9ab5;text-transform:uppercase}
+.copy{position:absolute;top:6px;right:8px;font:500 12px var(--body);background:#2a3a5e;color:#e9eef8;border:0;border-radius:6px;padding:3px 9px;cursor:pointer}
+.copy:hover{background:#3a4d77}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;background:var(--chip)}
+blockquote{margin-left:0;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px}
+blockquote p{margin:0}
+li.t{list-style:none;margin-left:-1.2em}
+label.task{display:block;position:relative;padding-left:26px;cursor:pointer}
+label.task input{position:absolute;left:0;top:.3em;margin:0;accent-color:var(--accent);width:16px;height:16px}
+h3[id^="oefening"]{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:10px 14px}
+footer{grid-column:2;color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:16px;margin-top:24px}
+@media (max-width:860px){
+  .wrap{grid-template-columns:1fr;gap:24px}
+  nav.toc{position:static;max-height:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+  footer{grid-column:1}
+}
+@media print{nav.toc,.copy{display:none}.wrap{display:block}pre{white-space:pre-wrap}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="../"><img src="../icons/logo-mark.png" alt="" width="30" height="30"><span>digidave</span></a>
+    <h1>Cursus Playwright</h1>
+    <p class="lead">Van je eerste test tot een complete testsuite. Acht modules met uitleg, voorbeeldcode en oefeningen op echte webapps. Je voortgang in de checklists wordt in deze browser onthouden.</p>
+  </header>
+  <nav class="toc" aria-label="Inhoud"><strong>Inhoud</strong><ol><li><a href="#hoe-deze-cursus-werkt">Hoe deze cursus werkt</a></li><li><a href="#module-1-installatie-en-je-eerste-test">Module 1 – Installatie en je eerste test</a></li><li><a href="#module-2-locators-en-acties">Module 2 – Locators en acties</a></li><li><a href="#module-3-assertions-en-automatisch-wachten">Module 3 – Assertions en automatisch wachten</a></li><li><a href="#module-4-tests-structureren-groepen-hooks-en-fixtures">Module 4 – Tests structureren: groepen, hooks en fixtures</a></li><li><a href="#module-5-debuggen-codegen-en-de-trace-viewer">Module 5 – Debuggen, codegen en de trace viewer</a></li><li><a href="#module-6-het-page-object-model">Module 6 – Het Page Object Model</a></li><li><a href="#module-7-moeilijkere-situaties-inloggen-netwerk-en-kaarten">Module 7 – Moeilijkere situaties: inloggen, netwerk en kaarten</a></li><li><a href="#module-8-een-echte-testsuite-configuratie-en-ci">Module 8 – Een echte testsuite: configuratie en CI</a></li><li><a href="#eindopdracht-een-testsuite-voor-een-volledige-werkstroom">Eindopdracht – een testsuite voor een volledige werkstroom</a></li><li><a href="#spiekbrief">Spiekbrief</a></li></ol></nav>
+  <main id="inhoud">
+<h2 id="hoe-deze-cursus-werkt">Hoe deze cursus werkt</h2>
+<p>In 8 modules ga je van je eerste test naar een complete Playwright-testsuite in TypeScript die automatisch draait bij elke push naar GitHub. Elke module heeft drie delen: <strong>uitleg</strong>, <strong>voorbeeldcode</strong> en een <strong>oefening op een echte webapp</strong>. Reken op 1 tot 2 uur per module.</p>
+<p><strong>Werkwijze per module</strong></p>
+<ol>
+<li>Lees de uitleg en typ de voorbeelden zelf over (niet kopiëren: dan blijft het beter hangen).</li>
+<li>Doe de oefening. Loop je vast, kijk dan pas bij de hints.</li>
+<li>Kom je er niet uit? Lees eerst de foutmelding goed (module 5 legt uit hoe). Bespreek het daarna met een collega, of plak je code en foutmelding in een AI-assistent en vraag om uitleg.</li>
+</ol>
+<p><strong>De oefenapps</strong></p>
+<p>De oefeningen gebruiken apps van <a href="https://bruindav.github.io/DigidaveStore/">DigidaveStore</a>, een verzameling webapps die online staan.</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>App</th>
+<th>Waarom deze app</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1–3</td>
+<td><a href="https://bruindav.github.io/DigidaveStore/">DigidaveStore</a></td>
+<td>Eenvoudige pagina met groepen, kaarten en links: ideaal om te beginnen</td>
+</tr>
+<tr>
+<td>3–4</td>
+<td><a href="https://bruindav.github.io/qr-lezer/">QR Lezer</a></td>
+<td>Eén duidelijke functie, inclusief bestand uploaden</td>
+</tr>
+<tr>
+<td>5–6</td>
+<td><a href="https://bruindav.github.io/mijntuin/">Mijn Tuin</a></td>
+<td>Meer schermen en formulieren: geschikt voor Page Objects</td>
+</tr>
+<tr>
+<td>7</td>
+<td><a href="https://bruindav.github.io/HornetApp/">HoornaarZoeken</a></td>
+<td>Kaart (Leaflet), inloggen en netwerkverkeer</td>
+</tr>
+<tr>
+<td>8 + eind</td>
+<td><a href="https://bruindav.github.io/DigidaveStore/prototypes/operationeel-portaal.html">Operationeel Portaal Scheepvaart</a></td>
+<td>Lijkt het meest op ons werk: modules, formulieren, rollen</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Let op:</strong> voor een deel van de oefeningen in module 5 tot en met 7 is een account nodig. We zoeken nog uit hoe iedereen daar kan oefenen. Kun je niet inloggen, doe dan het deel van de oefening dat zonder account kan.</p>
+</blockquote>
+<p><strong>Spelregel:</strong> deze apps draaien met echte gegevens. Schrijf geen tests die gegevens aanmaken, wijzigen of wissen, tot je in module 7 leert hoe je dat veilig doet (mocken).</p>
+<p><strong>Voorbereiding</strong></p>
+<ul>
+<li class="t"><label class="task"><input type="checkbox" data-k="t1"> Node.js LTS geïnstalleerd (<code>node -v</code> geeft versie 20 of hoger)</label></li>
+<li class="t"><label class="task"><input type="checkbox" data-k="t2"> VS Code geïnstalleerd, met de extensie <em>Playwright Test for VSCode</em> (van Microsoft)</label></li>
+<li class="t"><label class="task"><input type="checkbox" data-k="t3"> Git geïnstalleerd (<code>git --version</code> werkt) en een GitHub-account</label></li>
+<li class="t"><label class="task"><input type="checkbox" data-k="t4"> Een lege map gemaakt, bijvoorbeeld <code>C:\dev\playwright-cursus</code>, en in VS Code geopend via <em>File &gt; Open Folder…</em></label></li>
+</ul>
+<p>We werken in <strong>TypeScript</strong>. Ken je weinig TypeScript? Geen probleem. Playwright-tests gebruiken maar een klein deel van de taal, en het wordt uitgelegd waar het nodig is.</p>
+<h2 id="module-1-installatie-en-je-eerste-test">Module 1 – Installatie en je eerste test</h2>
+<p>Na deze module heb je een werkend Playwright-project en schrijf je zelf een test die een pagina opent en de titel controleert.</p>
+<p><strong>Wat is Playwright?</strong> Een framework van Microsoft dat een echte browser (Chromium, Firefox, WebKit/Safari) bestuurt vanuit code. Jij schrijft wat een gebruiker doet (klikken, typen) en wat je verwacht te zien. Playwright voert dat uit en meldt wat er misgaat.</p>
+<h3 id="11-project-aanmaken">1.1 Project aanmaken</h3>
+<p>Open een terminal in je lege map (in VS Code: <em>Terminal &gt; New Terminal</em>) en voer uit:</p>
+<pre data-lang="bash"><code>npm init playwright@latest
+</code></pre>
+<p>Kies: TypeScript, map <code>tests</code>, GitHub Actions workflow <strong>ja</strong>, browsers installeren <strong>ja</strong>. Je krijgt:</p>
+<ul>
+<li><code>playwright.config.ts</code> – de instellingen</li>
+<li><code>tests/example.spec.ts</code> – een voorbeeldtest</li>
+<li><code>package.json</code> – je project en afhankelijkheden</li>
+<li><code>.github/workflows/playwright.yml</code> – voor module 8</li>
+</ul>
+<h3 id="12-tests-draaien">1.2 Tests draaien</h3>
+<pre data-lang="bash"><code>npx playwright test              # alle tests, onzichtbaar (headless)
+npx playwright test --headed     # met zichtbare browser
+npx playwright test --ui         # UI-modus: het fijnste om mee te leren
+npx playwright show-report       # het HTML-rapport bekijken
+npx playwright test --project=chromium   # alleen in Chromium
+</code></pre>
+<p>Standaard draait elke test in drie browsers (Chromium, Firefox en WebKit), dus in het rapport zie je elke test drie keer. Tijdens het leren is <code>--project=chromium</code> sneller en overzichtelijker.</p>
+<h3 id="13-anatomie-van-een-test">1.3 Anatomie van een test</h3>
+<pre data-lang="ts"><code>import { test, expect } from '@playwright/test';
+
+test('pagina heeft de juiste titel', async ({ page }) =&gt; {
+  await page.goto('https://bruindav.github.io/DigidaveStore/');
+  await expect(page).toHaveTitle(/Digidave/i);
+});
+</code></pre>
+<ul>
+<li><code>test('naam', ...)</code> – één testgeval met een beschrijvende naam.</li>
+<li><code>async ({ page })</code> – Playwright geeft je een verse browsertab: de <code>page</code>-<em>fixture</em>.</li>
+<li><code>await</code> – elke browseractie kost tijd. Vergeet je <code>await</code>, dan krijg je vreemde fouten. Dit is de meest gemaakte beginnersfout.</li>
+<li><code>expect(...)</code> – de controle. Zonder <code>expect</code> test je eigenlijk niets.</li>
+<li><code>/Digidave/i</code> – een reguliere expressie: ‘bevat Digidave’, hoofdletterongevoelig. Met aanhalingstekens (<code>'Digidave'</code>) moet de titel precies gelijk zijn.</li>
+</ul>
+<p><strong>VS Code-tips:</strong> sla op met <strong>Ctrl+S</strong> (een wit bolletje op het tabblad betekent: niet opgeslagen, en dan draait Playwright de oude versie) of zet <em>File &gt; Auto Save</em> aan. Met de Playwright-extensie staat er een groen driehoekje naast elke test; klik erop om alleen die test te draaien.</p>
+<h3 id="oefening-1-digidavestore">Oefening 1 – DigidaveStore</h3>
+<p>Maak <code>tests/digidavestore.spec.ts</code> (rechtsklik op de map <code>tests</code> &gt; <em>New File…</em>) en schrijf:</p>
+<ol>
+<li>Een test die de pagina opent en controleert dat de titel klopt (zoek eerst de echte titel op in het browsertabblad).</li>
+<li>Een test die controleert dat de URL <code>DigidaveStore</code> bevat (<code>toHaveURL</code>).</li>
+<li>Draai beide in de UI-modus. Verander daarna bewust de verwachte titel in iets fouts en bekijk hoe de foutmelding eruitziet.</li>
+</ol>
+<p><strong>Klaar als:</strong> 2 groene tests, en je kunt in eigen woorden uitleggen wat <code>await</code> en <code>expect</code> doen.</p>
+<p><em>Hint:</em> zie je <code>Timeout 5000ms exceeded</code>, dan was je verwachting fout: Playwright heeft 5 seconden gewacht tot de pagina eraan voldeed.</p>
+<h2 id="module-2-locators-en-acties">Module 2 – Locators en acties</h2>
+<p>Na deze module kun je elk element op een pagina betrouwbaar vinden en ermee werken zoals een gebruiker dat doet.</p>
+<p>Een <strong>locator</strong> is een beschrijving van hoe je een element vindt. Het element wordt pas gezocht op het moment dat je er iets mee doet. Daardoor werkt een locator ook als de pagina tussendoor verandert.</p>
+<h3 id="21-de-voorkeursvolgorde">2.1 De voorkeursvolgorde</h3>
+<p>Zoek elementen zoals een gebruiker ze ziet, niet via de interne opbouw van de pagina. Dat maakt tests robuust bij een herontwerp.</p>
+<ol>
+<li><code>page.getByRole('button', { name: 'Opslaan' })</code> – rol + zichtbare naam. <strong>Altijd eerst proberen.</strong></li>
+<li><code>page.getByLabel('E-mailadres')</code> – formuliervelden via hun label.</li>
+<li><code>page.getByPlaceholder('Zoek...')</code> – als er geen label is.</li>
+<li><code>page.getByText('Welkom terug')</code> – tekst die geen knop of link is.</li>
+<li><code>page.getByAltText('logo')</code> / <code>getByTitle(...)</code> – afbeeldingen en tooltips.</li>
+<li><code>page.getByTestId('melding-opslaan')</code> – een <code>data-testid</code>-attribuut dat het ontwikkelteam toevoegt. Goed om met je team af te spreken.</li>
+<li><code>page.locator('#id')</code> of <code>page.locator('article.card')</code> – CSS. Laatste redmiddel: breekt snel.</li>
+</ol>
+<p>Veelgebruikte rollen: <code>button</code>, <code>link</code>, <code>heading</code>, <code>textbox</code>, <code>checkbox</code>, <code>combobox</code> (dropdown), <code>listitem</code>, <code>article</code>, <code>dialog</code>, <code>tab</code>, <code>row</code>, <code>main</code>, <code>navigation</code>.</p>
+<p><strong>CSS-selectors in het kort:</strong> <code>article</code> is een tag, <code>.card</code> een klasse, <code>article.card</code> (zonder spatie) een element dat beide is, <code>#rev-title</code> een id, <code>.card h3</code> (met spatie) een <code>h3</code> ergens binnen een <code>.card</code>, <code>button[type="button"]</code> een attribuut. In Chrome DevTools (F12 &gt; Elements) kun je met Ctrl+F een selector uitproberen.</p>
+<h3 id="22-verfijnen-en-combineren">2.2 Verfijnen en combineren</h3>
+<pre data-lang="ts"><code>// binnen een ander element zoeken
+const kaart = page.getByRole('article').filter({ hasText: 'QR Lezer' });
+await kaart.getByRole('link', { name: /Open app/ }).click();
+
+// alleen binnen het hoofdgedeelte van de pagina zoeken
+const main = page.getByRole('main');
+await main.getByRole('button', { name: /Handige tools/ }).click();
+
+// het eerste, laatste of n-de element
+page.getByRole('article').first();
+page.getByRole('article').nth(2);   // telt vanaf 0
+
+// exacte naam in plaats van 'bevat'
+page.getByRole('button', { name: 'Opslaan', exact: true });
+</code></pre>
+<h3 id="23-acties">2.3 Acties</h3>
+<pre data-lang="ts"><code>await page.getByLabel('Naam').fill('Jan');              // veld leegmaken en invullen
+await page.getByRole('button', { name: 'Zoek' }).click();
+await page.getByLabel('Status').selectOption('Open');  // native &lt;select&gt;
+await page.getByRole('checkbox', { name: 'Akkoord' }).check();
+await page.getByLabel('Zoek').press('Enter');
+await page.getByText('Melding').hover();
+</code></pre>
+<p><strong>Angular Material:</strong> een <code>mat-select</code> is géén native <code>&lt;select&gt;</code>, dus <code>selectOption</code> werkt niet. Je klikt de dropdown open en kiest dan een optie: <code>await page.getByRole('combobox', { name: 'Status' }).click();</code> gevolgd door <code>await page.getByRole('option', { name: 'Open' }).click();</code>.</p>
+<h3 id="oefening-2-digidavestore-verkennen">Oefening 2 – DigidaveStore verkennen</h3>
+<ol>
+<li>Tel hoeveel apps er op de pagina staan en controleer dat aantal met <code>toHaveCount(n)</code>.</li>
+<li>Klap één groep open, controleer hoeveel apps er dan zichtbaar zijn, klik bij QR Lezer op <em>Open app</em> en controleer dat je op de QR Lezer-pagina uitkomt.</li>
+<li>Controleer dat de groep ‘Persoonlijk’ bestaat (<code>getByRole('heading', ...)</code>).</li>
+<li>Uitdaging: schrijf voor elke locator in je test op welke plek van de lijst in 2.1 hij staat. Gebruik je CSS? Kijk of het met een rol kan.</li>
+</ol>
+<p><em>Hints:</em></p>
+<ul>
+<li>Ingeklapte groepen zijn verborgen. <code>getByRole</code> telt alleen wat een gebruiker kan zien; <code>page.locator('article.card')</code> telt alles in de HTML, ook verborgen kaarten.</li>
+<li>Elke groepsnaam staat twee keer op de pagina: als filterknop bovenaan en als groepstitel. Krijg je <em>strict mode violation … resolved to 2 elements</em>, zoek dan binnen <code>page.getByRole('main')</code>.</li>
+<li>Een link opent in een nieuw tabblad? Zie module 7.4.</li>
+<li>Open de pagina met <code>npx playwright codegen https://bruindav.github.io/DigidaveStore/</code> en wijs elementen aan: je ziet direct welke locator Playwright voorstelt. Codegen komt uitgebreid terug in module 5.</li>
+</ul>
+<h2 id="module-3-assertions-en-automatisch-wachten">Module 3 – Assertions en automatisch wachten</h2>
+<p>Na deze module weet je hoe je controleert wat er op het scherm staat, en waarom je in Playwright (bijna) nooit zelf hoeft te wachten.</p>
+<h3 id="31-auto-waiting">3.1 Auto-waiting</h3>
+<p>Voor elke actie wacht Playwright automatisch tot het element zichtbaar, stabiel en klikbaar is. Een <code>expect</code> op een locator probeert het steeds opnieuw, standaard tot 5 seconden. Daarom geldt:</p>
+<ul>
+<li><strong>Nooit</strong> <code>await page.waitForTimeout(3000)</code> gebruiken om ‘even te wachten’. Het maakt tests traag én onbetrouwbaar.</li>
+<li>Wacht in plaats daarvan op wat je wilt zien: <code>await expect(page.getByText('Opgeslagen')).toBeVisible();</code></li>
+</ul>
+<h3 id="32-de-belangrijkste-assertions">3.2 De belangrijkste assertions</h3>
+<table>
+<thead>
+<tr>
+<th>Assertion</th>
+<th>Controleert</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>toBeVisible()</code> / <code>toBeHidden()</code></td>
+<td>Element wel of niet zichtbaar</td>
+</tr>
+<tr>
+<td><code>toHaveText('...')</code> / <code>toContainText('...')</code></td>
+<td>Exacte tekst / tekst bevat</td>
+</tr>
+<tr>
+<td><code>toHaveValue('...')</code></td>
+<td>Waarde van een invoerveld</td>
+</tr>
+<tr>
+<td><code>toHaveCount(n)</code></td>
+<td>Aantal gevonden elementen</td>
+</tr>
+<tr>
+<td><code>toBeEnabled()</code> / <code>toBeDisabled()</code></td>
+<td>Knop of veld bruikbaar</td>
+</tr>
+<tr>
+<td><code>toBeChecked()</code></td>
+<td>Checkbox aangevinkt</td>
+</tr>
+<tr>
+<td><code>toHaveAttribute('href', /qr/)</code></td>
+<td>Attribuut met waarde</td>
+</tr>
+<tr>
+<td><code>toHaveClass(/actief/)</code></td>
+<td>CSS-klasse aanwezig</td>
+</tr>
+<tr>
+<td><code>toHaveURL(/.../)</code> / <code>toHaveTitle(...)</code></td>
+<td>Op de pagina zelf</td>
+</tr>
+</tbody>
+</table>
+<p>Omkeren doe je met <code>.not</code>: <code>await expect(foutmelding).not.toBeVisible();</code></p>
+<p><strong>Soft assertions</strong> laten de test doorlopen na een fout, zodat je alle afwijkingen in één keer ziet: <code>await expect.soft(titel).toHaveText('Mijn Tuin');</code></p>
+<h3 id="33-let-op-het-verschil">3.3 Let op het verschil</h3>
+<pre data-lang="ts"><code>// GOED – wacht en probeert opnieuw
+await expect(page.getByRole('heading')).toHaveText('Resultaat');
+
+// FOUT – leest één keer en vergelijkt direct, geen wachten
+const tekst = await page.getByRole('heading').textContent();
+expect(tekst).toBe('Resultaat');
+</code></pre>
+<h3 id="34-bestand-uploaden">3.4 Bestand uploaden</h3>
+<pre data-lang="ts"><code>await page.getByLabel('Kies afbeelding').setInputFiles('tests/fixtures/qr-test.png');
+</code></pre>
+<h3 id="oefening-3-qr-lezer">Oefening 3 – QR Lezer</h3>
+<p>Maak eerst met een gratis QR-generator een afbeelding met de tekst <code>https://example.com</code> en sla die op als <code>tests/fixtures/qr-test.png</code>.</p>
+<ol>
+<li>Test dat de startpagina laadt en dat de uploadknop zichtbaar en bruikbaar is.</li>
+<li>Upload de afbeelding en controleer dat het resultaat <code>https://example.com</code> toont.</li>
+<li>Upload een afbeelding <em>zonder</em> QR-code (bijv. een foto) en controleer de foutmelding die de app dan toont.</li>
+<li>Uitdaging: zoek in je test naar één plek waar je zou willen ‘wachten’ en vervang dat door een assertion.</li>
+</ol>
+<p><em>Hint:</em> is het uploadveld verborgen achter een mooie knop? <code>setInputFiles</code> werkt ook op een verborgen <code>&lt;input type="file"&gt;</code>: <code>page.locator('input[type=file]')</code>. Dit is een van de weinige plekken waar CSS prima is.</p>
+<h2 id="module-4-tests-structureren-groepen-hooks-en-fixtures">Module 4 – Tests structureren: groepen, hooks en fixtures</h2>
+<p>Na deze module zijn je tests overzichtelijk gegroepeerd, zonder herhaalde code, en draaien ze onafhankelijk van elkaar.</p>
+<h3 id="41-gouden-regel-elke-test-staat-op-zichzelf">4.1 Gouden regel: elke test staat op zichzelf</h3>
+<p>Elke test krijgt een schone browser (nieuwe <em>context</em>: geen cookies, geen localStorage). Een test mag nooit afhangen van een eerdere test. Playwright draait tests bovendien <strong>parallel</strong>, dus de volgorde is niet gegarandeerd.</p>
+<h3 id="42-groeperen-en-hooks">4.2 Groeperen en hooks</h3>
+<pre data-lang="ts"><code>import { test, expect } from '@playwright/test';
+
+test.describe('QR Lezer – uploaden', () =&gt; {
+  test.beforeEach(async ({ page }) =&gt; {
+    await page.goto('https://bruindav.github.io/qr-lezer/');
+  });
+
+  test('leest een geldige QR-code', async ({ page }) =&gt; { /* ... */ });
+  test('meldt een afbeelding zonder QR-code', async ({ page }) =&gt; { /* ... */ });
+});
+</code></pre>
+<ul>
+<li><code>beforeEach</code> / <code>afterEach</code> – voor en na elke test in de groep.</li>
+<li><code>beforeAll</code> / <code>afterAll</code> – één keer per groep (bijv. testdata klaarzetten).</li>
+<li><code>test.skip()</code>, <code>test.only()</code>, <code>test.fixme()</code> – tijdelijk overslaan, alleen deze draaien, of markeren als bekend probleem. Laat <code>.only</code> nooit staan bij het committen.</li>
+</ul>
+<h3 id="43-baseurl">4.3 baseURL</h3>
+<p>Zet in <code>playwright.config.ts</code> onder <code>use</code>: <code>baseURL: 'https://bruindav.github.io'</code>. Dan schrijf je in tests kort <code>await page.goto('/qr-lezer/');</code>. Later wissel je met één regel tussen test- en productieomgeving.</p>
+<h3 id="44-eigen-fixtures">4.4 Eigen fixtures</h3>
+<p>Een fixture levert iets aan een test, zoals <code>page</code>. Je kunt er zelf een maken, bijvoorbeeld een pagina die al op de QR Lezer staat:</p>
+<pre data-lang="ts"><code>// tests/fixtures.ts
+import { test as base, type Page } from '@playwright/test';
+
+export const test = base.extend&lt;{ qrPagina: Page }&gt;({
+  qrPagina: async ({ page }, use) =&gt; {
+    await page.goto('/qr-lezer/');   // klaarzetten
+    await use(page);                 // hier draait de test
+    // hier eventueel opruimen
+  },
+});
+export { expect } from '@playwright/test';
+</code></pre>
+<p>In je test importeer je dan <code>test</code> uit <code>./fixtures</code> in plaats van uit <code>@playwright/test</code> en schrijf je <code>async ({ qrPagina }) =&gt; ...</code>.</p>
+<h3 id="oefening-4-opruimen">Oefening 4 – Opruimen</h3>
+<ol>
+<li>Herschrijf je QR Lezer-tests met <code>test.describe</code> en <code>beforeEach</code>.</li>
+<li>Zet <code>baseURL</code> in de config en maak alle <code>goto</code>-aanroepen kort.</li>
+<li>Zet je DigidaveStore- en QR Lezer-tests elk in een eigen bestand; draai daarna alles en bekijk in het rapport dat ze parallel liepen.</li>
+<li>Uitdaging: maak de fixture <code>qrPagina</code> uit 4.4 en gebruik die in één test.</li>
+</ol>
+<h2 id="module-5-debuggen-codegen-en-de-trace-viewer">Module 5 – Debuggen, codegen en de trace viewer</h2>
+<p>Na deze module vind je binnen een paar minuten uit waarom een test faalt, en laat je Playwright het eerste concept van een test voor je opnemen.</p>
+<h3 id="51-codegen-opnemen-in-plaats-van-typen">5.1 Codegen: opnemen in plaats van typen</h3>
+<pre data-lang="bash"><code>npx playwright codegen https://bruindav.github.io/mijntuin/
+</code></pre>
+<p>Je klikt door de app; Playwright schrijft de code mee. Handig als startpunt, maar <strong>altijd nabewerken</strong>: codegen voegt geen of weinig <code>expect</code>s toe, kiest soms zwakke locators en neemt elke misklik op. In VS Code kan hetzelfde met <em>Record new</em> in het Testing-paneel.</p>
+<h3 id="52-debugmogelijkheden">5.2 Debugmogelijkheden</h3>
+<table>
+<thead>
+<tr>
+<th>Hulpmiddel</th>
+<th>Hoe</th>
+<th>Wanneer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UI-modus</td>
+<td><code>npx playwright test --ui</code></td>
+<td>Stap voor stap terugkijken, locators uitproberen</td>
+</tr>
+<tr>
+<td>Debug-modus</td>
+<td><code>npx playwright test --debug</code></td>
+<td>Regel voor regel door een test lopen</td>
+</tr>
+<tr>
+<td>Pauze in code</td>
+<td><code>await page.pause();</code></td>
+<td>Op één plek stoppen en zelf rondkijken</td>
+</tr>
+<tr>
+<td>VS Code</td>
+<td>Breakpoint zetten, rechtsklik op het driehoekje &gt; <em>Debug Test</em></td>
+<td>Als je gewend bent aan breakpoints</td>
+</tr>
+<tr>
+<td>Trace viewer</td>
+<td><code>npx playwright show-trace trace.zip</code></td>
+<td>Een mislukte test achteraf analyseren, ook uit CI</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-de-trace-viewer">5.3 De trace viewer</h3>
+<p>Een trace is een opname van een test: per stap een screenshot, het DOM, netwerkverzoeken en console-meldingen. Zet in de config onder <code>use</code>:</p>
+<pre data-lang="ts"><code>trace: 'on-first-retry',     // trace bij de herhaling van een mislukte test
+screenshot: 'only-on-failure',
+video: 'retain-on-failure',
+</code></pre>
+<p>In het HTML-rapport klik je bij een mislukte test op <em>Trace</em>. Kijk vooral naar het tabblad <strong>Before/After</strong> van de stap die faalde, en naar <strong>Console</strong> en <strong>Network</strong>: vaak zie je daar de echte oorzaak (een JavaScript-fout, een verzoek dat 403 geeft).</p>
+<h3 id="54-een-foutmelding-lezen">5.4 Een foutmelding lezen</h3>
+<p>Playwright vertelt je drie dingen: welke locator, wat het verwachtte en wat het kreeg. Lees altijd eerst de regel <code>Locator:</code> en de <code>Call log</code>. <em>Strict mode violation</em> betekent: je locator vond meerdere elementen, maak hem specifieker.</p>
+<h3 id="oefening-5-mijn-tuin">Oefening 5 – Mijn Tuin</h3>
+<ol>
+<li>Neem met codegen een korte route op: naar het plantenoverzicht en één plant openen (inloggen alleen als je een account hebt).</li>
+<li>Bewerk de opname: verbeter zwakke locators, haal misklikken weg en voeg minstens 3 <code>expect</code>s toe.</li>
+<li>Maak de test bewust kapot (verkeerde verwachte tekst), draai hem met <code>--trace on</code> en zoek in de trace de stap waar het misgaat.</li>
+<li>Uitdaging: open de trace, ga naar het tabblad Network en zoek een verzoek naar Firestore. Wat zie je?</li>
+</ol>
+<p><em>Let op:</em> zet nooit een wachtwoord in je testcode. In module 7 leer je hoe het netjes moet.</p>
+<h2 id="module-6-het-page-object-model">Module 6 – Het Page Object Model</h2>
+<p>Na deze module staan je locators en schermacties op één plek, zodat een wijziging in de app maar één aanpassing in je tests kost. Dit is de standaardopzet in vrijwel elk professioneel testteam.</p>
+<h3 id="61-het-idee">6.1 Het idee</h3>
+<p>Zonder Page Objects staat <code>page.getByLabel('Plantnaam')</code> in twintig tests. Hernoemt iemand het label, dan pas je twintig plekken aan. Met een Page Object staat die locator in één klasse, en lezen je tests als een verhaal: <code>await planten.zoek('Lavendel')</code>.</p>
+<h3 id="62-een-page-object-schrijven">6.2 Een Page Object schrijven</h3>
+<pre data-lang="ts"><code>// pages/PlantenPagina.ts
+import { type Page, type Locator } from '@playwright/test';
+
+export class PlantenPagina {
+  readonly page: Page;
+  readonly zoekveld: Locator;
+  readonly plantkaarten: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.zoekveld = page.getByPlaceholder('Zoek plant');
+    this.plantkaarten = page.getByRole('listitem');
+  }
+
+  async open() {
+    await this.page.goto('/mijntuin/');
+  }
+
+  async zoek(naam: string) {
+    await this.zoekveld.fill(naam);
+  }
+
+  kaart(naam: string): Locator {
+    return this.plantkaarten.filter({ hasText: naam });
+  }
+}
+</code></pre>
+<pre data-lang="ts"><code>// tests/planten.spec.ts
+import { test, expect } from '@playwright/test';
+import { PlantenPagina } from '../pages/PlantenPagina';
+
+test('zoeken toont alleen de gezochte plant', async ({ page }) =&gt; {
+  const planten = new PlantenPagina(page);
+  await planten.open();
+  await planten.zoek('Lavendel');
+  await expect(planten.kaart('Lavendel')).toBeVisible();
+});
+</code></pre>
+<p>De locators in dit voorbeeld zijn ter illustratie: zoek met codegen of DevTools uit hoe de echte elementen heten.</p>
+<p><strong>TypeScript-opfrisser:</strong> <code>class</code> is een bouwtekening, <code>constructor</code> wordt uitgevoerd bij <code>new</code>, <code>readonly</code> betekent ‘niet meer overschrijven’, en <code>: string</code> of <code>: Locator</code> vertelt welk type iets is.</p>
+<h3 id="63-vuistregels">6.3 Vuistregels</h3>
+<ul>
+<li>Eén klasse per scherm of duidelijk onderdeel (bijv. ook een <code>Navigatie</code>-klasse voor het menu).</li>
+<li>Methodes beschrijven wat een gebruiker doet (<code>voegPlantToe</code>), niet hoe (<code>klikOpKnop3</code>).</li>
+<li>Zet <code>expect</code>s bij voorkeur in de test, niet in het Page Object. Dan zie je in de test wat er gecontroleerd wordt.</li>
+<li>Combineer met een fixture (module 4) zodat je <code>new PlantenPagina(page)</code> niet steeds hoeft te typen: <code>async ({ plantenPagina }) =&gt; ...</code>.</li>
+</ul>
+<h3 id="oefening-6-mijn-tuin-herbouwen">Oefening 6 – Mijn Tuin herbouwen</h3>
+<ol>
+<li>Maak een map <code>pages/</code> met minstens twee Page Objects voor Mijn Tuin, bijvoorbeeld het plantenoverzicht en de tuinplattegrond of het bloeiwiel.</li>
+<li>Herschrijf je test uit module 5 zodat er geen enkele <code>getBy...</code> meer in het testbestand staat.</li>
+<li>Schrijf 3 nieuwe tests die alleen de Page Objects gebruiken (bijv. zoeken, een plant openen, wisselen tussen maanden in het bloeiwiel).</li>
+<li>Uitdaging: maak een fixture die je Page Objects levert, en vergelijk hoe leesbaar je test nu is ten opzichte van de codegen-versie.</li>
+</ol>
+<h2 id="module-7-moeilijkere-situaties-inloggen-netwerk-en-kaarten">Module 7 – Moeilijkere situaties: inloggen, netwerk en kaarten</h2>
+<p>Na deze module test je apps met een login, controleer en vervals je netwerkverkeer, en kun je omgaan met lastige onderdelen zoals een Leaflet-kaart en pop-ups.</p>
+<h3 id="71-geheimen-buiten-je-code">7.1 Geheimen buiten je code</h3>
+<p>Zet de gegevens van je testaccount in een bestand <code>.env</code> (en voeg <code>.env</code> toe aan <code>.gitignore</code>!):</p>
+<pre data-lang="bash"><code>TEST_EMAIL=test@voorbeeld.nl
+TEST_WACHTWOORD=...
+</code></pre>
+<p>Installeer <code>npm i -D dotenv</code> en zet bovenaan <code>playwright.config.ts</code>: <code>import 'dotenv/config';</code>. In je code gebruik je dan <code>process.env.TEST_EMAIL!</code>. Gebruik nooit een beheerdersaccount voor tests.</p>
+<h3 id="72-een-keer-inloggen-overal-ingelogd-storage-state">7.2 Eén keer inloggen, overal ingelogd (storage state)</h3>
+<p>Inloggen in elke test is traag. Log daarom één keer in een <em>setup</em>-test in, sla de sessie op en hergebruik die:</p>
+<pre data-lang="ts"><code>// tests/auth.setup.ts
+import { test as setup, expect } from '@playwright/test';
+
+setup('inloggen', async ({ page }) =&gt; {
+  await page.goto('/HornetApp/');
+  await page.getByLabel('E-mail').fill(process.env.TEST_EMAIL!);
+  await page.getByLabel('Wachtwoord').fill(process.env.TEST_WACHTWOORD!);
+  await page.getByRole('button', { name: 'Inloggen' }).click();
+  await expect(page.getByText('Uitloggen')).toBeVisible();
+  await page.context().storageState({ path: 'playwright/.auth/user.json', indexedDB: true });
+});
+</code></pre>
+<p>In de config maak je een project <code>setup</code> en laat je andere projecten daarvan afhangen met <code>dependencies: ['setup']</code> en <code>use: { storageState: 'playwright/.auth/user.json' }</code>. Zet <code>playwright/.auth</code> ook in <code>.gitignore</code>. <strong>Let op:</strong> Firebase Auth bewaart de sessie in IndexedDB, daarom staat <code>indexedDB: true</code> erbij.</p>
+<h3 id="73-netwerk-controleren-en-vervalsen">7.3 Netwerk controleren en vervalsen</h3>
+<pre data-lang="ts"><code>// wachten op een verzoek en het antwoord controleren
+const antwoord = page.waitForResponse(r =&gt; r.url().includes('firestore') &amp;&amp; r.status() === 200);
+await page.getByRole('button', { name: 'Vernieuwen' }).click();
+await antwoord;
+
+// een externe dienst vervangen door een nepantwoord (mock)
+await page.route('**/api.open-meteo.com/**', route =&gt;
+  route.fulfill({ json: { current: { temperature_2m: 21 } } })
+);
+
+// een fout simuleren: hoe reageert de app als een dienst plat ligt?
+await page.route('**/tiles/**', route =&gt; route.abort());
+</code></pre>
+<p>Mocken is dé manier om situaties te testen die je in het echt moeilijk kunt opwekken (lege lijst, serverfout, trage verbinding) zonder echte data aan te raken. Het verkeer van de Firestore-SDK zelf laat zich lastig mocken; daarvoor gebruik je in de praktijk een apart testproject of de Firebase Emulator.</p>
+<h3 id="74-lastige-onderdelen">7.4 Lastige onderdelen</h3>
+<ul>
+<li><strong>Pop-ups van de browser</strong> (<code>confirm</code>, <code>alert</code>): <code>page.once('dialog', d =&gt; d.accept());</code> vóór de klik.</li>
+<li><strong>Nieuw tabblad</strong>: <code>const nieuw = page.waitForEvent('popup'); await link.click(); const tab = await nieuw;</code></li>
+<li><strong>Kaart (Leaflet)</strong>: markers zijn gewone elementen: <code>page.locator('.leaflet-marker-icon')</code>. Klikken op een plek op de kaart: <code>await page.locator('#map').click({ position: { x: 200, y: 150 } });</code></li>
+<li><strong>Visuele vergelijking</strong>: <code>await expect(page).toHaveScreenshot();</code> maakt de eerste keer een referentiebeeld en vergelijkt daarna. Handig voor een kaart of SVG-plattegrond, maar kies dan een vaste schermgrootte.</li>
+</ul>
+<h3 id="oefening-7-hoornaarzoeken">Oefening 7 – HoornaarZoeken</h3>
+<ol>
+<li>Zorg voor een testaccount met de laagste rol en zet de gegevens in <code>.env</code>.</li>
+<li>Bouw de storage-state-setup uit 7.2 en controleer dat een test direct ingelogd start.</li>
+<li>Test dat er markers op de kaart verschijnen en dat een klik op een marker de details van een waarneming toont.</li>
+<li>Blokkeer de kaarttegels met <code>page.route</code> en controleer dat de app nog bruikbaar blijft.</li>
+<li>Uitdaging: test dat een gebruiker met de laagste rol géén beheerknoppen ziet (rolgebaseerde toegang).</li>
+</ol>
+<p><em>Geen account?</em> Doe opdracht 4 en de oefeningen met <code>page.route</code> uit 7.3 op de pagina's die zonder inloggen werken, en oefen 7.4 met de links in DigidaveStore die een nieuw tabblad openen.</p>
+<h2 id="module-8-een-echte-testsuite-configuratie-en-ci">Module 8 – Een echte testsuite: configuratie en CI</h2>
+<p>Na deze module heb je een testsuite die op meerdere browsers en schermformaten draait, en automatisch bij elke push op GitHub.</p>
+<h3 id="81-mappenstructuur">8.1 Mappenstructuur</h3>
+<pre data-lang="text"><code>playwright-cursus/
+  pages/              Page Objects
+  tests/
+    fixtures.ts       eigen fixtures
+    fixtures/         testbestanden (afbeeldingen e.d.)
+    auth.setup.ts
+    portaal/          tests per app of module
+  playwright.config.ts
+  .env                (niet in Git)
+</code></pre>
+<h3 id="82-de-config-projecten-retries-parallel">8.2 De config: projecten, retries, parallel</h3>
+<pre data-lang="ts"><code>import { defineConfig, devices } from '@playwright/test';
+import 'dotenv/config';
+
+export default defineConfig({
+  testDir: './tests',
+  fullyParallel: true,
+  retries: process.env.CI ? 2 : 0,       // op GitHub 2 herkansingen
+  forbidOnly: !!process.env.CI,          // vergeten .only laat CI falen
+  reporter: [['html'], ['list']],
+  use: {
+    baseURL: process.env.BASE_URL ?? 'https://bruindav.github.io',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+  },
+  projects: [
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, dependencies: ['setup'] },
+    { name: 'firefox',  use: { ...devices['Desktop Firefox'] }, dependencies: ['setup'] },
+    { name: 'mobiel',   use: { ...devices['Galaxy S9+'] },     dependencies: ['setup'] },
+  ],
+});
+</code></pre>
+<p>Eén project draaien: <code>npx playwright test --project=mobiel</code>. Alleen tests met een label: geef de test een tag, <code>test('opslaan', { tag: '@smoke' }, ...)</code>, en draai <code>npx playwright test --grep @smoke</code>.</p>
+<p>Chrome, Edge, Vivaldi en Brave zijn allemaal op Chromium gebouwd; slaagt een test in <code>chromium</code>, dan werkt hij daar vrijwel zeker ook. Wil je toch de echte Chrome of Edge gebruiken, zet dan <code>channel: 'chrome'</code> of <code>channel: 'msedge'</code> in <code>use</code>.</p>
+<h3 id="83-github-actions">8.3 GitHub Actions</h3>
+<p>Het bestand <code>.github/workflows/playwright.yml</code> uit module 1 doet al het meeste: Node installeren, <code>npm ci</code>, browsers installeren, tests draaien en het rapport als <em>artifact</em> bewaren. Voeg geheimen toe via GitHub &gt; repo &gt; Settings &gt; Secrets and variables &gt; Actions, en geef ze door in de workflow:</p>
+<pre data-lang="yaml"><code>      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          TEST_WACHTWOORD: ${{ secrets.TEST_WACHTWOORD }}
+</code></pre>
+<p>Faalt een test op GitHub? Download het artifact <code>playwright-report</code>, pak het uit en open de trace (module 5).</p>
+<h3 id="84-flaky-tests">8.4 Flaky tests</h3>
+<p>Een test die soms slaagt en soms faalt heet <em>flaky</em>. Oorzaken zijn bijna altijd: vaste wachttijden, tests die van elkaar afhangen, of gedeelde testdata. Zoek ze op met <code>npx playwright test --repeat-each=10</code>. Los ze op; verhoog niet zomaar de time-outs.</p>
+<h3 id="oefening-8-operationeel-portaal-scheepvaart">Oefening 8 – Operationeel Portaal Scheepvaart</h3>
+<ol>
+<li>Maak een nieuwe GitHub-repo <code>playwright-cursus</code>, zet je werk erin en controleer dat de workflow groen draait.</li>
+<li>Voeg tests toe voor het portaal: de dashboardpagina laadt, en je kunt wisselen tussen de modules Melding, Storing en Incident.</li>
+<li>Draai alles ook op het project <code>mobiel</code> en los op wat daar anders gaat.</li>
+<li>Markeer 3 snelle, belangrijke tests als <code>@smoke</code>.</li>
+<li>Uitdaging: draai je suite 10 keer achter elkaar en repareer elke test die één keer faalt.</li>
+</ol>
+<h2 id="eindopdracht-een-testsuite-voor-een-volledige-werkstroom">Eindopdracht – een testsuite voor een volledige werkstroom</h2>
+<p>Bouw voor het Operationeel Portaal Scheepvaart een suite die de werkstroom van een <strong>Storing</strong> van begin tot eind test, zoals je dat in een echt project zou doen.</p>
+<ul>
+<li class="t"><label class="task"><input type="checkbox" data-k="t5"> Page Objects voor het dashboard, het Storing-formulier en het journaal</label></li>
+<li class="t"><label class="task"><input type="checkbox" data-k="t6"> Een test die een storing aanmaakt (velden invullen), opslaat en terugvindt in het overzicht</label></li>
+<li class="t"><label class="task"><input type="checkbox" data-k="t7"> Validatietests: verplichte velden leeg laten en de foutmeldingen controleren</label></li>
+<li class="t"><label class="task"><input type="checkbox" data-k="t8"> Een test per rol: wat mag een operator wel en niet zien of doen</label></li>
+<li class="t"><label class="task"><input type="checkbox" data-k="t9"> Minstens één test die een netwerkfout simuleert met <code>page.route</code></label></li>
+<li class="t"><label class="task"><input type="checkbox" data-k="t10"> Testdata wordt na afloop opgeruimd, of de test gebruikt alleen nepdata</label></li>
+<li class="t"><label class="task"><input type="checkbox" data-k="t11"> Draait groen in GitHub Actions op Chromium en mobiel</label></li>
+</ul>
+<p>Klaar? Vraag een collega om een code review van je repo, en review die van hem of haar.</p>
+<h2 id="spiekbrief">Spiekbrief</h2>
+<table>
+<thead>
+<tr>
+<th>Wat</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pagina openen</td>
+<td><code>await page.goto('/pad/')</code></td>
+</tr>
+<tr>
+<td>Knop klikken</td>
+<td><code>await page.getByRole('button', { name: 'X' }).click()</code></td>
+</tr>
+<tr>
+<td>Veld invullen</td>
+<td><code>await page.getByLabel('X').fill('tekst')</code></td>
+</tr>
+<tr>
+<td>Dropdown (native)</td>
+<td><code>await page.getByLabel('X').selectOption('waarde')</code></td>
+</tr>
+<tr>
+<td>Bestand uploaden</td>
+<td><code>await locator.setInputFiles('pad')</code></td>
+</tr>
+<tr>
+<td>Zichtbaar?</td>
+<td><code>await expect(locator).toBeVisible()</code></td>
+</tr>
+<tr>
+<td>Tekst?</td>
+<td><code>await expect(locator).toHaveText('X')</code></td>
+</tr>
+<tr>
+<td>Aantal?</td>
+<td><code>await expect(locator).toHaveCount(3)</code></td>
+</tr>
+<tr>
+<td>Filteren</td>
+<td><code>locator.filter({ hasText: 'X' })</code></td>
+</tr>
+<tr>
+<td>Binnen een deel zoeken</td>
+<td><code>page.getByRole('main').getByRole('button', ...)</code></td>
+</tr>
+<tr>
+<td>Mocken</td>
+<td><code>await page.route('**/api/**', r =&gt; r.fulfill({ json: {} }))</code></td>
+</tr>
+<tr>
+<td>Pauzeren</td>
+<td><code>await page.pause()</code></td>
+</tr>
+<tr>
+<td>Alles draaien</td>
+<td><code>npx playwright test</code></td>
+</tr>
+<tr>
+<td>Eén browser</td>
+<td><code>npx playwright test --project=chromium</code></td>
+</tr>
+<tr>
+<td>UI-modus</td>
+<td><code>npx playwright test --ui</code></td>
+</tr>
+<tr>
+<td>Opnemen</td>
+<td><code>npx playwright codegen &lt;url&gt;</code></td>
+</tr>
+<tr>
+<td>Rapport</td>
+<td><code>npx playwright show-report</code></td>
+</tr>
+</tbody>
+</table>
+<p>Officiële documentatie: <a href="https://playwright.dev/docs/intro">playwright.dev</a>. Vooral de pagina's over <a href="https://playwright.dev/docs/locators">Locators</a> en <a href="https://playwright.dev/docs/best-practices">Best Practices</a> zijn de moeite waard.</p>
+  </main>
+  <footer><a href="../">Terug naar het projectoverzicht</a></footer>
+</div>
+<script>
+// Kopieerknop bij elk codeblok
+document.querySelectorAll("pre").forEach(pre => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "copy"; b.textContent = "Kopieer";
+  b.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(pre.querySelector("code").innerText); b.textContent = "Gekopieerd"; }
+    catch (_) { b.textContent = "Lukt niet"; }
+    setTimeout(() => b.textContent = "Kopieer", 1500);
+  });
+  pre.appendChild(b);
+});
+// Checklists onthouden in deze browser
+const KEY = "playwright-cursus-voortgang";
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (_) {}
+document.querySelectorAll("label.task input").forEach(cb => {
+  if (cb.dataset.k in saved) cb.checked = saved[cb.dataset.k];
+  cb.addEventListener("change", () => {
+    saved[cb.dataset.k] = cb.checked;
+    try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (_) {}
+  });
+});
+// Inhoudsopgave: markeer het hoofdstuk dat in beeld is
+const links = [...document.querySelectorAll("nav.toc a")];
+const obs = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  links.forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + e.target.id));
+}), { rootMargin: "0px 0px -75% 0px" });
+document.querySelectorAll("main h2[id]").forEach(h => obs.observe(h));
+</script>
+</body>
+</html>
