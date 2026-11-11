@@ -169,6 +169,7 @@ footer button:hover{color:var(--ink)}
     <button type="button" data-f="thuis" aria-pressed="false">Thuis &amp; financiën</button>
     <button type="button" data-f="hulp" aria-pressed="false">Handige tools</button>
     <button type="button" data-f="leren" aria-pressed="false">Leren &amp; cursussen</button>
+    <button type="button" data-f="spel" aria-pressed="false">Spellen</button>
     <button type="button" data-f="persoonlijk" aria-pressed="false">Persoonlijk</button>
     <button type="button" data-f="werk" aria-pressed="false">Scheepvaart &amp; incidenten</button>
   </nav>
@@ -208,6 +209,7 @@ const CATS = {
   thuis: { title: "Thuis & financiën", intro: "Persoonlijke apps voor agenda, tuin, financiën en administratie." },
   hulp: { title: "Handige tools", intro: "Kleine hulpmiddelen voor dagelijks gebruik." },
   leren: { title: "Leren & cursussen", intro: "Cursussen en lesmateriaal die ik met AI heb opgezet om zelf iets nieuws te leren." },
+  spel: { title: "Spellen", intro: "Spelletjes die ik met AI heb nagebouwd of bedacht, om op je telefoon of in de browser te spelen." },
   persoonlijk: { title: "Persoonlijk", intro: "Pagina's voor speciale gelegenheden en mensen die me dierbaar zijn." },
   werk: { title: "Scheepvaart & incidenten", intro: "Prototypes voor het registreren en afhandelen van gebeurtenissen op de vaarweg, bedoeld om oplossingsrichtingen te verkennen en met gebruikers te toetsen. De scheepvaart-prototypes zijn gemaakt voor grotere schermen en nog niet geschikt voor mobiel." }
 };
@@ -290,6 +292,10 @@ const P = [
   { cat:"leren", name:"Cursus Playwright", url:"./cursussen/playwright.html", label:"Open cursus", status:"live",
     desc:"Cursus in acht modules om testautomatisering met Playwright en TypeScript te leren: van je eerste test via locators, assertions en Page Objects tot een complete testsuite in GitHub Actions. Na elke module oefen je op een van mijn eigen apps.",
     tags:["Playwright","TypeScript","Testautomatisering"] },
+  { cat:"spel", name:"Schroefjes 3D", repo:"ScrewGame", label:"Speel", status:"live",
+    desc:"3D-schroevenpuzzel: draai de schroeven uit een speelgoedauto, poppenhuis of poppetje en sorteer ze per kleur in dozen. Onderdelen vallen eraf zodra ze los zijn, en dieper in het model zitten interieur, meubels en een batterijvak. Met boosters, steeds moeilijkere levels en volledig scherm op je telefoon.",
+    tags:["Three.js","3D","PWA"],
+    shots:{ dir:"screwgame", captions:["Speelgoedauto met dozen per kleur en de reserve","Poppenhuis met zonnepanelen, ramen en bloembak","Poppetje met bodywarmer, rugzak en pet"] } },
   { cat:"persoonlijk", name:"In memoriam Hester", repo:"Hester", status:"live",
     desc:"Herdenkingspagina voor mijn vriendin Hester.",
     tags:["HTML"] },
