@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- fix-25: altijd maar één groep tegelijk open -->
+<!-- fix-27: op Android de geïnstalleerde app openen als die er is -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -322,12 +322,19 @@ function revLabel(p){
   const st = rated ? `<span class="st">★</span> ${avg.toFixed(1).replace(".", ",")} · ` : "";
   return `${st}${n} ${n === 1 ? "reactie" : "reacties"}${nw}`;
 }
+// fix-27: op Android via een intent-link openen, zodat Android de geïnstalleerde app kiest als die er is;
+// anders (of als dat niet lukt) gewoon de website in de browser
+const isAndroid = /Android/i.test(navigator.userAgent);
+function appLink(href){
+  if (!isAndroid || !/^https:\/\/[^#]+$/.test(href)) return href;
+  return `intent://${href.slice(8)}#Intent;scheme=https;S.browser_fallback_url=${encodeURIComponent(href)};end`;
+}
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function card(p){
   const status = p.status === "live" ? '<span class="status live">Online</span>' : p.status === "lokaal" ? '<span class="status local">Lokaal</span>' : '<span class="status proto">Prototype</span>';
   const href = p.url || (p.repo && !p.nolink ? PAGES + p.repo + "/" : "");
   const actions = [
-    href ? `<a class="open" href="${href}" target="_blank" rel="noopener">${esc(p.label || "Open app")} ↗</a>` : `<span class="nolink">${esc(p.nolink||"")}</span>`,
+    href ? `<a class="open" href="${appLink(href)}"${isAndroid && /^https:\/\/[^#]+$/.test(href) ? "" : ' target="_blank" rel="noopener"'}>${esc(p.label || "Open app")} ↗</a>` : `<span class="nolink">${esc(p.nolink||"")}</span>`,
     p.demo ? `<a class="open demo" href="${p.demo}" target="_blank" rel="noopener">Probeer de demo ↗</a>` : "",
     p.repo ? `<a class="repo" href="${GH}${p.repo}" target="_blank" rel="noopener">Code</a>` : ""
   ].join("");
