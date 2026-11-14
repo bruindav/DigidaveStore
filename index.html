@@ -1,6 +1,7 @@
 <!doctype html>
 <!-- fix-25: altijd maar  één groep tegelijk open -->
 <!-- fix-28: PdfReader toegevoegd aan Handige tools -->
+<!-- fix-29: installatiestraat om na een reset alle apps één voor één opnieuw te installeren -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -71,7 +72,7 @@ body.admin .v-pick{display:inline-flex;align-items:center;gap:8px;font-size:14px
 .rev-btn:hover{border-color:var(--accent)}
 .rev-btn .st{color:var(--accent)}
 .rev-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-dialog.sheet{border:0;padding:0;width:min(560px,100%);max-height:min(88vh,100%);margin:auto;border-radius:14px;background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog.sheet{border:0;padding:0;width:min(560px,100%);max-width:100%;max-height:min(88vh,100%);margin:auto;border-radius:14px;background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
 dialog.sheet::backdrop{background:rgba(6,10,20,.6)}
 @media (max-width:560px){dialog.sheet{margin:auto 0 0;border-radius:14px 14px 0 0;max-height:92vh}}
 .sheet-inner{display:grid;gap:14px;padding:18px max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px))}
@@ -111,6 +112,25 @@ body.admin .unread-pill.has{display:inline-flex}
 .rv.unread{border-color:var(--accent)}
 .rv .tag-new{background:var(--accent);color:var(--accent-ink);border-radius:4px;padding:0 6px;font-size:11px;font-weight:600}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:var(--bg);font-size:14px;padding:10px 16px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center;z-index:20}
+.inst-btn{justify-self:start;display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font:500 13px var(--body);cursor:pointer}
+.inst-btn:hover{border-color:var(--accent)}
+.inst-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.in-help{margin:0;font-size:14px;color:var(--muted)}
+.in-help b{color:var(--ink);font-weight:600}
+.in-warn{margin:0;font-size:13px;background:var(--chip);border-radius:8px;padding:8px 10px}
+.in-bar{height:8px;border-radius:999px;background:var(--chip);overflow:hidden}
+.in-bar i{display:block;height:100%;background:var(--live);width:0;transition:width .2s}
+.in-list{display:grid;gap:8px;max-height:46vh;overflow-y:auto;padding-right:2px}
+.in-row{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg)}
+.in-row strong{font-size:15px}
+.in-row .in-st{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.in-row.ok .in-st{color:var(--live)}
+.in-row.ok strong,.in-row.skip strong{color:var(--muted)}
+.in-row.ask{border-color:var(--accent)}
+.in-row .in-q{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+.in-row .in-q .btn{padding:6px 12px;font-size:13px}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.in-go{text-decoration:none;display:inline-block}
 h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0;color:var(--navy);text-wrap:balance}
 .lead{margin:0;max-width:62ch;color:var(--muted)}
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 32px}
@@ -162,6 +182,7 @@ footer button:hover{color:var(--ink)}
     <h1>Mijn projecten</h1>
     <button type="button" class="unread-pill" id="unread-pill"></button>
     <p class="lead">Een overzicht van de apps en prototypes die ik samen met AI heb gebouwd. Klik op <strong>Open app</strong> om een project direct te starten.</p>
+    <button type="button" class="inst-btn" id="inst-btn">📲 Apps (opnieuw) installeren</button>
   </header>
 
   <nav class="filters" aria-label="Filter op categorie" id="filters">
@@ -194,6 +215,18 @@ footer button:hover{color:var(--ink)}
       <div class="sheet-head"><div><h3 id="rev-title"></h3><p id="rev-sum"></p></div><button class="x" id="rev-close" type="button" aria-label="Sluiten">✕</button></div>
       <div class="rv-list" id="rev-list"></div>
       <div class="rv-form" id="rev-form"></div>
+    </div>
+  </dialog>
+
+  <dialog class="sheet" id="inst" aria-labelledby="inst-title">
+    <div class="sheet-inner">
+      <div class="sheet-head"><div><h3 id="inst-title">Apps installeren</h3><p id="inst-sum"></p></div><button class="x" id="inst-close" type="button" aria-label="Sluiten">✕</button></div>
+      <div class="in-bar" aria-hidden="true"><i id="inst-bar"></i></div>
+      <p class="in-help">Tik op <b>Installeer</b>. De app opent in Chrome. Tik daar op <b>⋮</b> en kies <b>App installeren</b> of <b>Toevoegen aan startscherm</b>. Ga daarna terug naar deze pagina en vink de app af. Zo vergeet je er geen.</p>
+      <p class="in-warn" id="inst-standalone" hidden>Je gebruikt nu de geïnstalleerde DigidaveStore. Opent een app in een smal venster zonder installatieknop? Tik daar op <b>⋮</b> → <b>Openen in Chrome</b> en installeer hem dan.</p>
+      <div class="in-list" id="inst-list"></div>
+      <div class="rv-row"><button type="button" class="linkbtn" id="inst-reset">Lijst opnieuw beginnen</button><a class="btn in-go" id="inst-next" target="_blank" rel="noopener">Volgende app installeren ↗</a></div>
+      <p class="rv-note">Staat een app ook in de Play Store? Die zet je terug via Play Store → je profiel → Apps en apparaat beheren → Niet geïnstalleerd. Daar kun je er meerdere tegelijk aanvinken.</p>
     </div>
   </dialog>
 
@@ -236,7 +269,7 @@ const P = [
     desc:"App voor vrijwilligers die Aziatische hoornaars opsporen. Leg waarnemingen en vliegrichtingen vast op de kaart en zoek samen in realtime naar het nest.",
     tags:["Firebase","Leaflet","PWA"],
     shots:{ dir:"hornetapp", captions:["Zichtlijnen met afstand en zoeksector naar het nest","Waarnemingen en nesten per wijk, met het menu van een icoon","Zichtlijnen vanaf lokpotten in de Vrijheidsbuurt","Beheer: overzicht per gemeente en wijk","Waarneming vastleggen","Nest geruimd registreren","Kaartoverzicht (Play Store)","Eenvoudig iconen plaatsen (Play Store)","Overzicht per gemeente (Play Store)","Zichtlijn met stopwatch en kompas (Play Store)"] } },
-  { cat:"vrijwillig", name:"Handleiding Vespa Finder", url:"https://bruindav.github.io/HornetApp/handleiding-vespafinder.html", label:"Open handleiding", status:"live",
+  { cat:"vrijwillig", name:"Handleiding Vespa Finder", noInstall:true, url:"https://bruindav.github.io/HornetApp/handleiding-vespafinder.html", label:"Open handleiding", status:"live",
     desc:"Handleiding voor vrijwilligers die met de Vespa Finder-app van Robor Nature een gezenderde Aziatische hoornaar naar het nest volgen. Over de voorbereiding van een zenderactie, de instellingen, de kaart lezen tijdens het zoeken en een hoornaar registreren.",
     tags:["Handleiding","Vespa Finder"],
     shots:{ dir:"vespafinder", captions:["De kaart lezen tijdens een zenderactie", "Vliegrichting en gewicht van een meting", "Een nieuwe voorspelling vastleggen", "Kaartinstellingen", "Online synchroniseren met het team"] } },
@@ -547,6 +580,68 @@ revDlg.addEventListener("click", async e => {
   }
 });
 
+
+// Installatiestraat (fix-29): na een reset of op een nieuwe telefoon alle apps één voor één opnieuw installeren.
+// De browser staat niet toe dat een pagina andere apps installeert, dus we leiden je per app langs en houden bij wat al gedaan is.
+const instDlg = document.getElementById("inst");
+const INST_KEY = "installatiestraat";
+const appHref = p => p.url || (p.repo && !p.nolink ? PAGES + p.repo + "/" : "");
+const INST = P.filter(p => p.status === "live" && !p.noInstall && appHref(p) && !["werk","persoonlijk","leren"].includes(p.cat));
+let inst = {}; // naam -> "ok" | "skip" | "open"
+try { inst = JSON.parse(localStorage.getItem(INST_KEY) || "{}") || {}; } catch(_) {}
+const saveInst = () => { try { localStorage.setItem(INST_KEY, JSON.stringify(inst)) } catch(_) {} };
+const isDone = p => inst[p.name] === "ok" || inst[p.name] === "skip";
+function renderInst(){
+  const done = INST.filter(isDone).length, ok = INST.filter(p => inst[p.name] === "ok").length;
+  document.getElementById("inst-sum").textContent = done === INST.length
+    ? `Klaar! ${ok} van ${INST.length} apps geïnstalleerd.`
+    : `${done} van ${INST.length} gedaan · nog ${INST.length - done} te gaan`;
+  document.getElementById("inst-bar").style.width = (INST.length ? done / INST.length * 100 : 0) + "%";
+  document.getElementById("inst-list").innerHTML = INST.map(p => {
+    const st = inst[p.name], cls = st === "ok" ? "ok" : st === "skip" ? "skip" : st === "open" ? "ask" : "";
+    const label = st === "ok" ? "✓ Geïnstalleerd" : st === "skip" ? "Overgeslagen" : st === "open" ? "Geopend" : "Te doen";
+    const q = st === "open"
+      ? `<div class="in-q">Gelukt? <button type="button" class="btn" data-in="ok">✓ Ja, geïnstalleerd</button><button type="button" class="btn ghost" data-in="skip">Niet nodig</button></div>`
+      : "";
+    const act = isDone(p)
+      ? `<button type="button" class="linkbtn" data-in="undo">Ongedaan maken</button>`
+      : `<a class="open" href="${appHref(p)}" target="_blank" rel="noopener" data-in="open">Installeer ↗</a>`;
+    return `<div class="in-row ${cls}" data-app="${esc(p.name)}"><div><strong>${esc(p.name)}</strong><div class="in-st">${label}</div></div>${act}${q}</div>`;
+  }).join("");
+  const next = INST.find(p => !isDone(p) && inst[p.name] !== "open") || INST.find(p => !isDone(p));
+  const nb = document.getElementById("inst-next");
+  nb.hidden = !next;
+  if (next) { nb.href = appHref(next); nb.dataset.app = next.name; nb.textContent = `Volgende: ${next.name} ↗`; }
+}
+function openInst(){
+  document.getElementById("inst-standalone").hidden = !matchMedia("(display-mode: standalone)").matches;
+  renderInst(); instDlg.showModal();
+}
+document.getElementById("inst-btn").onclick = openInst;
+document.getElementById("inst-close").onclick = () => instDlg.close();
+instDlg.addEventListener("click", e => {
+  if (e.target === instDlg) { instDlg.close(); return; }
+  const nb = e.target.closest("#inst-next");
+  if (nb) { inst[nb.dataset.app] = "open"; saveInst(); setTimeout(renderInst, 50); return; }
+  const a = e.target.closest("[data-in]"); if (!a) return;
+  const name = a.closest(".in-row").dataset.app, act = a.dataset.in;
+  if (act === "open") { inst[name] = "open"; saveInst(); setTimeout(renderInst, 50); return; }
+  if (act === "undo") delete inst[name]; else inst[name] = act;
+  saveInst(); renderInst();
+});
+document.getElementById("inst-reset").addEventListener("click", e => {
+  if (e.target.dataset.sure !== "1") { e.target.dataset.sure = "1"; e.target.textContent = "Zeker weten? Tik nog een keer"; return; }
+  e.target.dataset.sure = ""; e.target.textContent = "Lijst opnieuw beginnen";
+  inst = {}; saveInst(); renderInst();
+});
+// Terug van een app: laat meteen de vraag "Gelukt?" zien
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible") return;
+  if (!INST.some(p => inst[p.name] === "open")) return;
+  if (!instDlg.open) openInst(); else renderInst();
+  instDlg.querySelector(".in-row.ask")?.scrollIntoView({ block: "nearest" });
+});
+
 // Terugknop: eerst het filter terugzetten, daarna twee keer drukken om af te sluiten
 let toastTimer, guardTimer;
 function toast(msg){
@@ -558,6 +653,7 @@ history.pushState({ app: "digidavestore" }, "");
 window.addEventListener("popstate", () => {
   if (viewer.open) { viewer.close(); history.pushState({ app: "digidavestore" }, ""); return; }
   if (revDlg.open) { revDlg.close(); history.pushState({ app: "digidavestore" }, ""); return; }
+  if (instDlg.open) { instDlg.close(); history.pushState({ app: "digidavestore" }, ""); return; }
   const active = document.querySelector('#filters button[aria-pressed="true"]');
   if (active && active.dataset.f !== "alle") {
     document.querySelector('#filters button[data-f="alle"]').click();
