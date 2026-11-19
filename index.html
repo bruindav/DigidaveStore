@@ -2,6 +2,7 @@
 <!-- fix-25: altijd maar  één groep tegelijk open -->
 <!-- fix-28: PdfReader toegevoegd aan Handige tools -->
 <!-- fix-29: installatiestraat om na een reset alle apps één voor één opnieuw te installeren -->
+<!-- fix-30: Mijn Huis Handleiding (OnzeWoning) toegevoegd aan Thuis & financiën -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -289,6 +290,10 @@ const P = [
     desc:"Houd je tuinplanten bij op een zelfgetekende plattegrond, met plantherkenning en een jaarkalender voor bloei en snoei.",
     tags:["Firebase","SVG"],
     shots:{ dir:"mijntuin", captions:["Plantvakken van de voortuin","Alle planten met foto en plantvak","Kalender: wat bloeit er deze maand","Kalender: snoeien, bemesten en bloei per maand","Plant bewerken","Snoei- en bemestmaanden per plant"] } },
+  { cat:"thuis", name:"Mijn Huis Handleiding", repo:"OnzeWoning", status:"live",
+    desc:"Alles over het huis op één plek: per ruimte de installaties en apparaten, met stap-voor-stap uitleg en foto's, onderhoudstaken, facturen, garanties en handleidingen (ook offline te lezen). In gewone taal, zodat ook je partner of een huisoppas kan opzoeken hoe de oven, de tv of de wasmachine werkt. Met een noodkaart voor als er iets misgaat. Inloggen alleen voor huisgenoten; er is ook een demo met voorbeeldgegevens.",
+    tags:["Firebase","PWA","pdf.js"],
+    shots:{ dir:"onzewoning", captions:["Startscherm met onderhoudsoverzicht en noodkaart","Alle onderdelen van een ruimte","Uitleg met foto's: welke knop hoort bij welke brander","Stap voor stap: de platenspeler","Onderhoud: wat moet er nu gebeuren","Noodkaart: wat te doen als er iets misgaat"] } },
   { cat:"thuis", name:"Pensioenplanner", help:"https://bruindav.github.io/PensioenBerekenen/#help", repo:"PensioenBerekenen", status:"live",
     desc:"Leest je pensioenoverzichten in en berekent je inkomen vanaf de pensioendatum, bruto en netto, met AOW, lijfrentes, spaargeld en de waarde van je woning.",
     tags:["React","IndexedDB"] },
