@@ -4,6 +4,7 @@
 <!-- fix-29: installatiestraat om na een reset alle apps één voor één opnieuw te installeren -->
 <!-- fix-30: Mijn Huis Handleiding (OnzeWoning) toegevoegd aan Thuis & financiën -->
 <!-- fix-31: help-link bij Mijn Huis Handleiding -->
+<!-- fix-32: NatUtrecht Trainersapp met demo-account toegevoegd aan Vrijwilligers & vereniging -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -169,6 +170,9 @@ section > p{margin:0 0 16px;color:var(--muted);font-size:14px;max-width:70ch}
 .open.demo{background:none;color:var(--accent);border:1px solid var(--accent)}
 .repo{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
 .repo:hover{color:var(--ink)}
+.login{margin:10px 0 0;padding:8px 10px;border:1px dashed var(--accent);border-radius:8px;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.login code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:600;color:var(--accent)}
+.login small{display:block;color:var(--muted)}
 .nolink{font-size:13px;color:var(--muted);font-style:italic}
 footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px}
 footer button{background:none;border:0;padding:0;font:inherit;color:var(--muted);text-decoration:underline dotted;cursor:pointer}
@@ -241,7 +245,7 @@ footer button:hover{color:var(--ink)}
 const GH = "https://github.com/bruindav/";
 const PAGES = "https://bruindav.github.io/";
 const CATS = {
-  vrijwillig: { title: "Vrijwilligers & vereniging", intro: "Apps die in de praktijk worden gebruikt door vrijwilligers en een vereniging van eigenaars." },
+  vrijwillig: { title: "Vrijwilligers & vereniging", intro: "Apps die in de praktijk worden gebruikt door vrijwilligers, een zwemvereniging en een vereniging van eigenaars." },
   thuis: { title: "Thuis & financiën", intro: "Persoonlijke apps voor agenda, tuin, financiën en administratie." },
   hulp: { title: "Handige tools", intro: "Kleine hulpmiddelen voor dagelijks gebruik." },
   leren: { title: "Leren & cursussen", intro: "Cursussen en lesmateriaal die ik met AI heb opgezet om zelf iets nieuws te leren." },
@@ -275,6 +279,10 @@ const P = [
     desc:"Handleiding voor vrijwilligers die met de Vespa Finder-app van Robor Nature een gezenderde Aziatische hoornaar naar het nest volgen. Over de voorbereiding van een zenderactie, de instellingen, de kaart lezen tijdens het zoeken en een hoornaar registreren.",
     tags:["Handleiding","Vespa Finder"],
     shots:{ dir:"vespafinder", captions:["De kaart lezen tijdens een zenderactie", "Vliegrichting en gewicht van een meting", "Een nieuwe voorspelling vastleggen", "Kaartinstellingen", "Online synchroniseren met het team"] } },
+  { cat:"vrijwillig", name:"NatUtrecht Trainersapp", repo:"trainersapp", url:"https://natutrecht-trainersapp.web.app/", help:"https://natutrecht-trainersapp.web.app/help", status:"live",
+    desc:"App voor de trainers van zwemvereniging Nat Utrecht. Geef je beschikbaarheid op, zie wie wanneer traint en ruil zelf een training. De coördinator maakt het rooster met vaste trainers en een ritme. Met het jaarplan als tijdlijn, met de opbouw naar wedstrijden, en een trainingslogboek. Trainers loggen in met Google na een uitnodiging; rondkijken kan met het demo-account. Daarin kun je niets opslaan.",
+    login:{ email:"DemoTrainer@demo.nu", wachtwoord:"Demo2026", note:"Tijdelijk, zolang de app in de testfase is" },
+    tags:["React","Firebase","PWA"] },
   { cat:"vrijwillig", name:"VvE Administratie", repo:"vve-administratie", status:"live",
     desc:"Leden-, bijdrage- en boekhoudadministratie voor een vereniging van eigenaars, met resultatenrekening, balans en begroting.",
     tags:["Firebase","HTML/JS"] },
@@ -386,6 +394,7 @@ function card(p){
     <p>${esc(p.desc)}${p.help ? ` <a class="more" href="${p.help}" target="_blank" rel="noopener">Meer…</a>` : ""}</p>
     ${p.shots ? `<button type="button" class="peek" aria-expanded="false">Toon voorbeeld <span>(${p.shots.captions.length} screenshots)</span></button>
     <div class="shots" hidden data-app="${esc(p.name)}"></div>` : ""}
+    ${p.login ? `<div class="login"><strong>Demo-account</strong> <span>${esc(p.login.email)}</span> · wachtwoord <code>${esc(p.login.wachtwoord)}</code>${p.login.note ? `<small>${esc(p.login.note)}</small>` : ""}</div>` : ""}
     <div class="tags">${p.tags.map(t=>`<span>${esc(t)}</span>`).join("")}</div>
     <div class="actions">${actions}<button type="button" class="rev-btn" data-app="${esc(p.name)}">${revLabel(p)}</button></div>
   </article>`;
